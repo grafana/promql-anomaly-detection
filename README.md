@@ -20,13 +20,13 @@ You will need to have Docker installed to run the demo.  The demo will start a P
 
 Once everything is running, head to [http://localhost:8080/grafana](http://localhost:8080/grafana) to access the Grafana UI. From there, you will find a dashboard called "Anomalies" within the "Anomalies" Folder.
 
-The demo shows how any metric tagged with the "anomaly_name" and "anomaly_type" labels will be used used for anomaly detection and displayed in the dashboard.
+The demo shows how any metric tagged with the `anomaly_name` and `anomaly_type` labels will be used used for anomaly detection and displayed in the dashboard.
 
 ## Usage
 
-Any metric with the "anomaly_name" and "anomaly_type" labels set will be considered for anomaly detection. The "/examples" folder shows how recording rules could be used for such purposes. This allows defining custom aggregation dimensions for the bands, such as "service", "job", "instance" or any other label.
+Any metric with the `anomaly_name` and `anomaly_type` labels set will be considered for anomaly detection. The `/examples` folder shows how recording rules could be used for such purposes. This allows defining custom aggregation dimensions for the bands, such as "service", "job", "instance" or any other label.
 
-Anomaly bands can be overlayed on top of the original time series in Grafana, allowing for easy visualization of the detected anomalies. An example of dashboard can be found in the "/demo/src/grafana/provisioning/dashboards/anomalies" folder.
+Anomaly bands can be overlayed on top of the original time series in Grafana, allowing for easy visualization of the detected anomalies. An example of dashboard can be found in the `demo/src/grafana/provisioning/dashboards/anomalies` folder.
 
 The framework is designed to be extended and adapted to different uses cases, while providing a solid foundation for anomaly detection in time series data.
 
@@ -42,4 +42,4 @@ Seasonality is also incorporated into the bands, allowing the bands to adapt to 
 
 ### Alerting Rules
 
-Alerting rules are used to detect when a time series crosses the anomaly bands. They can be found in the "/rules" folder
+Alerting rules are used to detect when a time series crosses the anomaly bands. They can be found in the `/rules` folder
