@@ -590,7 +590,8 @@ services:
       - --config.file=/etc/prometheus/prometheus-config.yaml
       - --storage.tsdb.path=/prometheus
       - --web.enable-lifecycle
-      - --web.route-prefix=/
+      - --web.route-prefix=/prometheus/
+      - --web.external-url=/prometheus/
       - --enable-feature=exemplar-storage
       - --enable-feature=otlp-write-receiver
     volumes:
