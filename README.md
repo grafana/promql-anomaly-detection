@@ -1,4 +1,4 @@
-# PromQL Anomaly Detection
+# PromQL Anomaly Detection Framework
 
 Framework for anomaly detection in time series data using Prometheus/PromQL.
 
