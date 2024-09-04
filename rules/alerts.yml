@@ -1,0 +1,17 @@
+groups:
+  - name: AnomalyAlerts
+    rules:
+
+      ################################################################
+      #                     Anomalies                                #
+      ################################################################
+
+      # Alert for anomalies based on standard deviation
+      - alert: AnomalyDetected
+        for: 5m
+        expr: >
+          last_over_time(anomaly:select[2m]) < last_over_time(anomaly:lower_band[2m])
+          or
+          last_over_time(anomaly:select[2m]) > last_over_time(anomaly:upper_band[2m])
+        labels:
+          severity: warning

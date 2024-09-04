@@ -1,0 +1,2504 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 293,
+    "links": [],
+    "panels": [
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 10,
+        "panels": [],
+        "title": "Baselines",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 10
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "anomaly_lower_band"
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "#73BF69",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "anomaly_upper_band"
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_lower_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 19,
+          "x": 0,
+          "y": 1
+        },
+        "id": 1,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "min(anomaly:lower_band{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"})",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "anomaly_lower_band",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "max(anomaly:upper_band{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"})",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "anomaly_upper_band",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Baselines",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 5,
+          "x": 19,
+          "y": 1
+        },
+        "id": 9,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "editorMode": "code",
+            "expr": "anomaly:stddev_multiplier",
+            "legendFormat": "stddev_multiplier",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:margin_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "margin_multiplier",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:threshold_by_covar",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "threshold_by_covar",
+            "range": true,
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:sparse_threshold",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "sparse_threshold",
+            "range": true,
+            "refId": "D"
+          }
+        ],
+        "title": "Constants",
+        "type": "stat"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 11
+        },
+        "id": 11,
+        "panels": [],
+        "title": "Explanation",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:avg_1h"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 0,
+          "y": 12
+        },
+        "id": 2,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "mid-line",
+            "range": true,
+            "refId": "B"
+          }
+        ],
+        "title": "1. Mid-line (avg over 1h)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "stddev_1h_filtered"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 8,
+          "y": 12
+        },
+        "id": 20,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:stddev_1h:filtered{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "stddev_1h_filtered",
+            "range": true,
+            "refId": "B"
+          }
+        ],
+        "title": "2. Stddev over 1h + High Pass Filter",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:stddev_st"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "stddev_1h_over_26h"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 16,
+          "y": 12
+        },
+        "id": 19,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "stddev_1h_over_26h",
+            "range": true,
+            "refId": "B"
+          }
+        ],
+        "title": "3. Smooth over 26h",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "short_term_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 10
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "short_term_lower_band"
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "short_term_lower_band"
+              },
+              "properties": [
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "green",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "short_term_upper_band"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 0,
+          "y": 22
+        },
+        "id": 8,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + last_over_time(anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "short_term_upper_band",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - last_over_time(anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "short_term_lower_band",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "4. Short term bands",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "margin_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 10
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "margin_lower_band"
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "margin_lower_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "margin_upper_band"
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 8,
+          "y": 22
+        },
+        "id": 7,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:margin_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "margin_lower_band",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:margin_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "margin_upper_band",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "5. Margin bands",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "long_term_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 10
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "long_term_lower_band"
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "long_term_lower_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 0
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "long_term_upper_band"
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "long_term_lower_threshold"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "long_term_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 16,
+          "y": 22
+        },
+        "id": 12,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "max(last_over_time(anomaly:upper_band_lt{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[10m])) by (anomaly_name)",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "long_term_upper_band",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "min(last_over_time(anomaly:lower_band_lt{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[10m])) by (anomaly_name)",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "long_term_lower_band",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "6. Seasonality",
+        "type": "timeseries"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 32
+        },
+        "id": 13,
+        "panels": [],
+        "title": "Alerts",
+        "type": "row"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {},
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 16,
+          "x": 0,
+          "y": 33
+        },
+        "id": 14,
+        "options": {
+          "alertInstanceLabelFilter": "{job=\"$job\", anomaly_name=~\"$anomaly_name\"}",
+          "alertName": "Anomaly",
+          "dashboardAlerts": false,
+          "folder": {
+            "title": "promcon-demo",
+            "uid": "edvzfs1zkr7r4d"
+          },
+          "groupBy": [],
+          "groupMode": "default",
+          "maxItems": 20,
+          "sortOrder": 1,
+          "stateFilter": {
+            "error": true,
+            "firing": true,
+            "noData": false,
+            "normal": false,
+            "pending": true
+          },
+          "viewMode": "list"
+        },
+        "pluginVersion": "11.3.0-75425",
+        "title": "Current Alerts",
+        "type": "alertlist"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 50,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 0,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "fieldMinMax": false,
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "pending"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "yellow",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "firing"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "red",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 16,
+          "y": 33
+        },
+        "id": 21,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "ALERTS{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", alertstate=\"firing\"}",
+            "legendFormat": "firing",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "ALERTS{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", alertstate=\"pending\"}",
+            "hide": false,
+            "legendFormat": "pending",
+            "range": true,
+            "refId": "B"
+          }
+        ],
+        "title": "Alerts over time",
+        "type": "timeseries"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 43
+        },
+        "id": 15,
+        "panels": [],
+        "title": "Approach Comparison",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 10
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "anomaly_lower_band"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "anomaly_upper_band"
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_lower_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 6,
+          "x": 0,
+          "y": 44
+        },
+        "id": 17,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "avg_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) - stddev_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "anomaly_lower_band",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "avg_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) + stddev_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "anomaly_upper_band",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Avg over 26h - Stddev over 26h",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 10
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "anomaly_lower_band"
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_lower_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 0
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "anomaly_upper_band"
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 6,
+          "x": 6,
+          "y": 44
+        },
+        "id": 18,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - stddev_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "anomaly_lower_band",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + stddev_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "anomaly_upper_band",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Avg over 1h - Stddev over 26h",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 10
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "anomaly_lower_band"
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_lower_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 0
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "anomaly_upper_band"
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 6,
+          "x": 12,
+          "y": 44
+        },
+        "id": 22,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "hide": false,
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - avg_over_time(anomaly:stddev_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "anomaly_lower_band",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + avg_over_time(anomaly:stddev_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "anomaly_upper_band",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Smooth stddev over 26h",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "short_term_upper_band"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 10
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "short_term_lower_band"
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "short_term_lower_band"
+              },
+              "properties": [
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0.1
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly:select"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "green",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
+                },
+                {
+                  "id": "custom.fillBelowTo",
+                  "value": "short_term_upper_band"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 6,
+          "x": 18,
+          "y": 44
+        },
+        "id": 16,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.0-75425",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+            "legendFormat": "{{anomaly_name}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + last_over_time(anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "short_term_upper_band",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "default"
+            },
+            "editorMode": "code",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - last_over_time(anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "short_term_lower_band",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Smooth + High Pass Filter",
+        "type": "timeseries"
+      }
+    ],
+    "preload": false,
+    "schemaVersion": 39,
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "text": "cortex",
+            "value": "cortex"
+          },
+          "definition": "label_values({anomaly_name=~\".+\"},job)",
+          "description": "",
+          "label": "job",
+          "name": "job",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values({anomaly_name=~\".+\"},job)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "type": "query"
+        },
+        {
+          "current": {
+            "text": "traces_spanmetrics_requests",
+            "value": "traces_spanmetrics_requests"
+          },
+          "definition": "label_values({job=\"$job\"},anomaly_name)",
+          "name": "anomaly_name",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values({job=\"$job\"},anomaly_name)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "type": "query"
+        },
+        {
+          "current": {
+            "text": "",
+            "value": ""
+          },
+          "definition": "label_values({job=\"$job\", anomaly_name=\"$anomaly_name\"},instance)",
+          "includeAll": false,
+          "label": "instance",
+          "name": "instance",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values({job=\"$job\", anomaly_name=\"$anomaly_name\"},instance)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "type": "query"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Anomalies",
+    "uid": "advzfvhalb94we",
+    "version": 84,
+    "weekStart": ""
+  }

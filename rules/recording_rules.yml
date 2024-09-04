@@ -1,0 +1,141 @@
+groups:
+  - name: AnomalyShortTerm
+    rules:
+
+      ################################################################################
+      #                     Constants                                                #
+      ################################################################################
+
+      - record: anomaly:threshold_by_covar
+        expr: |-
+          0.5
+
+      - record: anomaly:sparse_threshold
+        expr: |-
+          5/60
+
+      - record: anomaly:stddev_multiplier
+        expr: |-
+          2
+
+      - record: anomaly:margin_multiplier
+        expr: |-
+          0.5
+
+      ################################################################################
+      #                     Base Rules                                               #
+      ################################################################################
+
+      - record: anomaly:select
+        expr: |-
+          (
+            {anomaly_name!="", anomaly_type="request_rate", anomaly_select=""} > 0
+            # and (
+            #       max_over_time({anomaly_name!="", anomaly_type="request_rate", anomaly_select=""}[1h] offset 23h30m) > 0
+            #       or
+            #       max_over_time({anomaly_name!="", anomaly_type="request_rate", anomaly_select=""}[1h] offset 167h30m) > 0
+            #   )
+            unless avg_over_time({anomaly_name!="", anomaly_type="request_rate", anomaly_select=""}[1h]) < on() group_left anomaly:sparse_threshold
+          )
+          OR
+          {anomaly_name!="", anomaly_type="latency", anomaly_select=""} > 0
+          OR
+          {anomaly_name!="", anomaly_type="errors", anomaly_select=""} > 0
+          OR
+          {anomaly_name!="", anomaly_type="resource", anomaly_select=""} > 0
+        labels:
+          anomaly_select: 1
+
+      - record: anomaly:avg_1h
+        expr: |-
+          avg_over_time(anomaly:select[1h])
+
+      - record: anomaly:stddev_1h:filtered
+        expr: |-
+          stddev_over_time(anomaly:select[1h]) > anomaly:avg_1h * on() group_left anomaly:threshold_by_covar
+
+      - record: anomaly:stddev_st
+        expr: |-
+          avg_over_time(anomaly:stddev_1h:filtered[26h])
+
+      - record: anomaly:lower_band
+        expr: |-
+          clamp_min(
+            min without(prediction_type)
+            (
+                label_replace(
+                    last_over_time(anomaly:avg_1h[2m]) - last_over_time(anomaly:stddev_st[2m]) * on() group_left anomaly:stddev_multiplier,
+                    "prediction_type", "short_term", "", ""
+                )
+                or
+                label_replace(
+                    last_over_time(anomaly:avg_1h[2m]) - last_over_time(anomaly:avg_1h[2m]) * on() group_left anomaly:margin_multiplier,
+                    "prediction_type", "margin", "", ""
+                )
+                or
+                last_over_time(anomaly:lower_band_lt[10m])
+            ),
+            0
+          )
+
+      - record: anomaly:upper_band
+        expr: |-
+          max without(prediction_type)
+          (
+            label_replace(
+                last_over_time(anomaly:avg_1h[2m]) + last_over_time(anomaly:stddev_st[2m]) * on() group_left anomaly:stddev_multiplier,
+                "prediction_type", "short_term", "", ""
+            )
+            or
+            label_replace(
+                last_over_time(anomaly:avg_1h[2m]) + last_over_time(anomaly:avg_1h[2m]) * on() group_left anomaly:margin_multiplier,
+                "prediction_type", "margin", "", ""
+            )
+            or
+            last_over_time(anomaly:upper_band_lt[10m])
+          )
+
+  - name: AnomalyLongTerm
+    interval: 5m
+    rules:
+      - record: anomaly:upper_band
+        expr: |-
+          max without(look_back)
+          (
+            label_replace(
+                avg_over_time(anomaly:select[1h] offset 167h30m)
+                +
+                stddev_over_time(anomaly:select[1h] offset 167h30m)
+                        * on() group_left anomaly:stddev_multiplier,
+            "look_back", "1w", "", ""
+            )
+            or
+            label_replace(
+                avg_over_time(anomaly:avg_1h[1h] offset 23h30m)
+                +
+                stddev_over_time(anomaly:select[1h] offset 23h30m)
+                        * on() group_left anomaly:stddev_multiplier,
+            "look_back", "1d", "", "" 
+            )
+          )
+
+      - record: anomaly:upper_band
+        expr: |-
+          min without(look_back)
+          (
+            label_replace(
+                        avg_over_time(anomaly:select[1h] offset 167h30m)
+                        -
+                        stddev_over_time(anomaly:select[1h] offset 167h30m)
+                        * on() group_left anomaly:stddev_multiplier,
+            "look_back", "1w", "", ""
+            )
+            or
+            label_replace(
+                        avg_over_time(anomaly:select[1h] offset 23h30m)
+                        -
+                        stddev_over_time(anomaly:select[1h] offset 23h30m)
+                        * on() group_left anomaly:stddev_multiplier,
+            "look_back", "1d", "", ""
+            )
+          )
