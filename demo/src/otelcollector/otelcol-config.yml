@@ -55,6 +55,7 @@ processors:
 
 connectors:
   spanmetrics:
+    metrics_flush_interval: 15s
 
 service:
   pipelines:
