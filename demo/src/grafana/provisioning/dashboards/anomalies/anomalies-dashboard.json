@@ -18,7 +18,6 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 293,
     "links": [],
     "panels": [
       {
@@ -36,8 +35,9 @@
       },
       {
         "datasource": {
+          "default": true,
           "type": "prometheus",
-          "uid": "default"
+          "uid": "webstore-metrics"
         },
         "fieldConfig": {
           "defaults": {
@@ -172,6 +172,41 @@
                   "value": "never"
                 }
               ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "alerts"
+              },
+              "properties": [
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 16
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 0
+                },
+                {
+                  "id": "custom.axisSoftMin",
+                  "value": 0
+                },
+                {
+                  "id": "custom.axisSoftMax",
+                  "value": 1
+                },
+                {
+                  "id": "custom.axisPlacement",
+                  "value": "hidden"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-yellow",
+                    "mode": "fixed"
+                  }
+                }
+              ]
             }
           ]
         },
@@ -232,6 +267,19 @@
             "legendFormat": "anomaly_upper_band",
             "range": true,
             "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "webstore-metrics"
+            },
+            "editorMode": "code",
+            "expr": "ALERTS{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", alertstate=\"firing\", anomaly_select=\"1\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "alerts",
+            "range": true,
+            "refId": "D"
           }
         ],
         "title": "Baselines",
@@ -288,7 +336,7 @@
           "textMode": "auto",
           "wideLayout": true
         },
-        "pluginVersion": "11.3.0-75425",
+        "pluginVersion": "11.2.0",
         "targets": [
           {
             "editorMode": "code",
@@ -355,8 +403,9 @@
       },
       {
         "datasource": {
+          "default": true,
           "type": "prometheus",
-          "uid": "default"
+          "uid": "webstore-metrics"
         },
         "fieldConfig": {
           "defaults": {
@@ -489,7 +538,7 @@
             "expr": "anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
             "hide": false,
             "instant": false,
-            "legendFormat": "mid-line",
+            "legendFormat": "avg_1h",
             "range": true,
             "refId": "B"
           }
@@ -851,8 +900,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1047,8 +1095,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1243,8 +1290,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1430,199 +1476,6 @@
           "x": 0,
           "y": 32
         },
-        "id": 13,
-        "panels": [],
-        "title": "Alerts",
-        "type": "row"
-      },
-      {
-        "fieldConfig": {
-          "defaults": {},
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 10,
-          "w": 16,
-          "x": 0,
-          "y": 33
-        },
-        "id": 14,
-        "options": {
-          "alertInstanceLabelFilter": "{job=\"$job\", anomaly_name=~\"$anomaly_name\"}",
-          "alertName": "Anomaly",
-          "dashboardAlerts": false,
-          "folder": {
-            "title": "promcon-demo",
-            "uid": "edvzfs1zkr7r4d"
-          },
-          "groupBy": [],
-          "groupMode": "default",
-          "maxItems": 20,
-          "sortOrder": 1,
-          "stateFilter": {
-            "error": true,
-            "firing": true,
-            "noData": false,
-            "normal": false,
-            "pending": true
-          },
-          "viewMode": "list"
-        },
-        "pluginVersion": "11.3.0-75425",
-        "title": "Current Alerts",
-        "type": "alertlist"
-      },
-      {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "default"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 50,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": false,
-              "lineInterpolation": "linear",
-              "lineStyle": {
-                "fill": "solid"
-              },
-              "lineWidth": 0,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "never",
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "fieldMinMax": false,
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "pending"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "firing"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "red",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "gridPos": {
-          "h": 10,
-          "w": 8,
-          "x": 16,
-          "y": 33
-        },
-        "id": 21,
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "mode": "single",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "11.3.0-75425",
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "default"
-            },
-            "editorMode": "code",
-            "expr": "ALERTS{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", alertstate=\"firing\"}",
-            "legendFormat": "firing",
-            "range": true,
-            "refId": "A"
-          },
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "default"
-            },
-            "editorMode": "code",
-            "expr": "ALERTS{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", alertstate=\"pending\"}",
-            "hide": false,
-            "legendFormat": "pending",
-            "range": true,
-            "refId": "B"
-          }
-        ],
-        "title": "Alerts over time",
-        "type": "timeseries"
-      },
-      {
-        "collapsed": false,
-        "gridPos": {
-          "h": 1,
-          "w": 24,
-          "x": 0,
-          "y": 43
-        },
         "id": 15,
         "panels": [],
         "title": "Approach Comparison",
@@ -1679,8 +1532,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1771,9 +1623,9 @@
         },
         "gridPos": {
           "h": 10,
-          "w": 6,
+          "w": 8,
           "x": 0,
-          "y": 44
+          "y": 33
         },
         "id": 17,
         "options": {
@@ -1828,13 +1680,14 @@
             "refId": "C"
           }
         ],
-        "title": "Avg over 26h - Stddev over 26h",
+        "title": "Stddev over 26h",
         "type": "timeseries"
       },
       {
         "datasource": {
+          "default": true,
           "type": "prometheus",
-          "uid": "default"
+          "uid": "webstore-metrics"
         },
         "fieldConfig": {
           "defaults": {
@@ -1882,8 +1735,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1971,9 +1823,9 @@
         },
         "gridPos": {
           "h": 10,
-          "w": 6,
-          "x": 6,
-          "y": 44
+          "w": 8,
+          "x": 8,
+          "y": 33
         },
         "id": 18,
         "options": {
@@ -2007,7 +1859,7 @@
               "uid": "default"
             },
             "editorMode": "code",
-            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - stddev_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - avg_over_time(stddev_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[1h])[26h:1m]) * on() group_left anomaly:stddev_multiplier",
             "hide": false,
             "instant": false,
             "legendFormat": "anomaly_lower_band",
@@ -2020,7 +1872,7 @@
               "uid": "default"
             },
             "editorMode": "code",
-            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + stddev_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
+            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + avg_over_time(stddev_over_time(anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[1h])[26h:1m]) * on() group_left anomaly:stddev_multiplier",
             "hide": false,
             "instant": false,
             "legendFormat": "anomaly_upper_band",
@@ -2028,7 +1880,7 @@
             "refId": "C"
           }
         ],
-        "title": "Avg over 1h - Stddev over 26h",
+        "title": "Smooth Stddev",
         "type": "timeseries"
       },
       {
@@ -2082,209 +1934,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "anomaly_upper_band"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "super-light-blue",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "custom.fillOpacity",
-                  "value": 10
-                },
-                {
-                  "id": "custom.fillBelowTo",
-                  "value": "anomaly_lower_band"
-                },
-                {
-                  "id": "custom.lineWidth",
-                  "value": 0.1
-                },
-                {
-                  "id": "custom.showPoints",
-                  "value": "never"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "anomaly_lower_band"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "super-light-blue",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "custom.fillOpacity",
-                  "value": 0
-                },
-                {
-                  "id": "custom.lineWidth",
-                  "value": 0.1
-                },
-                {
-                  "id": "custom.showPoints",
-                  "value": "never"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "anomaly:select"
-              },
-              "properties": [
-                {
-                  "id": "custom.fillBelowTo",
-                  "value": "anomaly_upper_band"
-                },
-                {
-                  "id": "custom.showPoints",
-                  "value": "never"
-                }
-              ]
-            }
-          ]
-        },
-        "gridPos": {
-          "h": 10,
-          "w": 6,
-          "x": 12,
-          "y": 44
-        },
-        "id": 22,
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "mode": "single",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "11.3.0-75425",
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "default"
-            },
-            "editorMode": "code",
-            "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-            "hide": false,
-            "legendFormat": "{{anomaly_name}}",
-            "range": true,
-            "refId": "A"
-          },
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "default"
-            },
-            "editorMode": "code",
-            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - avg_over_time(anomaly:stddev_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
-            "hide": false,
-            "instant": false,
-            "legendFormat": "anomaly_lower_band",
-            "range": true,
-            "refId": "B"
-          },
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "default"
-            },
-            "editorMode": "code",
-            "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + avg_over_time(anomaly:stddev_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[26h]) * on() group_left anomaly:stddev_multiplier",
-            "hide": false,
-            "instant": false,
-            "legendFormat": "anomaly_upper_band",
-            "range": true,
-            "refId": "C"
-          }
-        ],
-        "title": "Smooth stddev over 26h",
-        "type": "timeseries"
-      },
-      {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "default"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 0,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": false,
-              "lineInterpolation": "linear",
-              "lineStyle": {
-                "fill": "solid"
-              },
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "auto",
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -2368,9 +2018,9 @@
         },
         "gridPos": {
           "h": 10,
-          "w": 6,
-          "x": 18,
-          "y": 44
+          "w": 8,
+          "x": 16,
+          "y": 33
         },
         "id": 16,
         "options": {
@@ -2429,19 +2079,27 @@
         "type": "timeseries"
       }
     ],
-    "preload": false,
+    "refresh": "",
     "schemaVersion": 39,
     "tags": [],
     "templating": {
       "list": [
         {
           "current": {
-            "text": "cortex",
-            "value": "cortex"
+            "selected": false,
+            "text": "frontend",
+            "value": "frontend"
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "webstore-metrics"
           },
           "definition": "label_values({anomaly_name=~\".+\"},job)",
           "description": "",
+          "hide": 0,
+          "includeAll": false,
           "label": "job",
+          "multi": false,
           "name": "job",
           "options": [],
           "query": {
@@ -2451,14 +2109,24 @@
           },
           "refresh": 1,
           "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
           "type": "query"
         },
         {
           "current": {
-            "text": "traces_spanmetrics_requests",
-            "value": "traces_spanmetrics_requests"
+            "selected": false,
+            "text": "otel_demo_requests",
+            "value": "otel_demo_requests"
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "webstore-metrics"
           },
           "definition": "label_values({job=\"$job\"},anomaly_name)",
+          "hide": 0,
+          "includeAll": false,
+          "multi": false,
           "name": "anomaly_name",
           "options": [],
           "query": {
@@ -2468,16 +2136,26 @@
           },
           "refresh": 1,
           "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
           "type": "query"
         },
         {
           "current": {
-            "text": "",
+            "isNone": true,
+            "selected": false,
+            "text": "None",
             "value": ""
           },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "webstore-metrics"
+          },
           "definition": "label_values({job=\"$job\", anomaly_name=\"$anomaly_name\"},instance)",
+          "hide": 0,
           "includeAll": false,
           "label": "instance",
+          "multi": false,
           "name": "instance",
           "options": [],
           "query": {
@@ -2487,6 +2165,8 @@
           },
           "refresh": 1,
           "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
           "type": "query"
         }
       ]
@@ -2499,6 +2179,6 @@
     "timezone": "browser",
     "title": "Anomalies",
     "uid": "advzfvhalb94we",
-    "version": 84,
+    "version": 2,
     "weekStart": ""
   }
