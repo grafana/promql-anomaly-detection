@@ -22,6 +22,8 @@ Once everything is running, head to [http://localhost:8080/grafana](http://local
 
 The demo shows how any metric tagged with the `anomaly_name` and `anomaly_type` labels will be used used for anomaly detection and displayed in the dashboard.
 
+<p align="center"><img src="docs/sources/assets/dashboard.png" alt="Anomalies Dashboard"></p>
+
 ## Usage
 
 Any metric with the `anomaly_name` and `anomaly_type` labels set will be considered for anomaly detection. The `/examples` folder shows how recording rules could be used for such purposes. This allows defining custom aggregation dimensions for the bands, such as "service", "job", "instance" or any other label.
