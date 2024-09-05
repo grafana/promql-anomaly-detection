@@ -12,6 +12,7 @@ datasources:
     editable: true
     isDefault: true
     jsonData:
+      timeInterval: 60s
       exemplarTraceIdDestinations:
         - datasourceUid: webstore-traces
           name: trace_id
