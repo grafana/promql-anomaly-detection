@@ -141,10 +141,6 @@
                   }
                 },
                 {
-                  "id": "custom.fillBelowTo",
-                  "value": "anomaly_upper_band"
-                },
-                {
                   "id": "custom.showPoints",
                   "value": "never"
                 }
@@ -176,7 +172,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "alerts"
+                "options": "anomalies"
               },
               "properties": [
                 {
@@ -277,7 +273,7 @@
             "expr": "ALERTS{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", alertstate=\"firing\", anomaly_select=\"1\"}",
             "hide": false,
             "instant": false,
-            "legendFormat": "alerts",
+            "legendFormat": "anomalies",
             "range": true,
             "refId": "D"
           }
@@ -900,7 +896,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -1095,7 +1092,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -1290,7 +1288,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -1532,7 +1531,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -1735,7 +1735,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -1934,7 +1935,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -2179,6 +2181,6 @@
     "timezone": "browser",
     "title": "Anomalies",
     "uid": "advzfvhalb94we",
-    "version": 2,
+    "version": 1,
     "weekStart": ""
   }
