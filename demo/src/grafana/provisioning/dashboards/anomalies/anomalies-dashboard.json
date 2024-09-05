@@ -201,6 +201,10 @@
                     "fixedColor": "super-light-yellow",
                     "mode": "fixed"
                   }
+                },
+                {
+                  "id": "custom.showPoints",
+                  "value": "never"
                 }
               ]
             }
@@ -897,8 +901,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1093,8 +1096,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1289,8 +1291,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1533,8 +1534,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1737,8 +1737,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1937,8 +1936,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -2183,6 +2181,6 @@
     "timezone": "browser",
     "title": "Anomalies",
     "uid": "advzfvhalb94we",
-    "version": 1,
+    "version": 2,
     "weekStart": ""
   }
