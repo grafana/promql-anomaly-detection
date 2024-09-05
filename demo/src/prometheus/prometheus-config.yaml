@@ -22,3 +22,4 @@ rule_files:
 - /etc/prometheus/rules/alerts.yml
 - /etc/prometheus/rules/examples/node_exporter.yml
 - /etc/prometheus/rules/examples/otel_demo.yml
+- /etc/prometheus/rules/extra/demo.yml
