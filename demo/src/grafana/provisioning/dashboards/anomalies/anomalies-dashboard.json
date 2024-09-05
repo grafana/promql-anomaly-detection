@@ -244,7 +244,7 @@
               "uid": "default"
             },
             "editorMode": "code",
-            "expr": "min(anomaly:lower_band{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"})",
+            "expr": "last_over_time(anomaly:lower_band{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m])",
             "hide": false,
             "instant": false,
             "legendFormat": "anomaly_lower_band",
@@ -257,7 +257,7 @@
               "uid": "default"
             },
             "editorMode": "code",
-            "expr": "max(anomaly:upper_band{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"})",
+            "expr": "last_over_time(anomaly:upper_band{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m])",
             "hide": false,
             "instant": false,
             "legendFormat": "anomaly_upper_band",
@@ -847,8 +847,9 @@
       },
       {
         "datasource": {
+          "default": true,
           "type": "prometheus",
-          "uid": "default"
+          "uid": "webstore-metrics"
         },
         "fieldConfig": {
           "defaults": {
@@ -2082,6 +2083,7 @@
         "type": "timeseries"
       }
     ],
+    "refresh": "",
     "schemaVersion": 39,
     "tags": [],
     "templating": {
