@@ -1887,7 +1887,7 @@
           "refId": "C"
         }
       ],
-      "title": "Bands: Smooth Stddev",
+      "title": "Bands: Smooth Stddev over 1h",
       "type": "timeseries"
     },
     {
@@ -2373,7 +2373,7 @@
           "refId": "B"
         }
       ],
-      "title": "Smooth Stddev",
+      "title": "Smooth Stddev over 1h",
       "type": "timeseries"
     },
     {
@@ -2518,7 +2518,7 @@
           "refId": "B"
         }
       ],
-      "title": "Stddev over 1h + High Pass Filter",
+      "title": "Smooth Stddev over 1h + High Pass Filter",
       "type": "timeseries"
     }
   ],
