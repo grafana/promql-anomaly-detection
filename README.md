@@ -20,7 +20,10 @@ You will need to have Docker installed to run the demo.  The demo will start a P
 
 Once everything is running, head to [http://localhost:8080/grafana](http://localhost:8080/grafana) to access the Grafana UI. From there, you will find a dashboard called "Anomalies" within the "Anomalies" Folder.
 
-The demo shows how any metric tagged with the `anomaly_name` and `anomaly_type` labels will be used used for anomaly detection and displayed in the dashboard.
+The demo dashboard shows how any metric tagged with the `anomaly_name` and `anomaly_type` labels will be used used for anomaly detection and displayed in the dashboard.
+
+You can simulate anomalies by altering the traffic patterns in the load generator, which can be accessed at [http://localhost:8080/loadgen/](http://localhost:8080/loadgen/).
+
 
 <p align="center"><img src="docs/sources/assets/dashboard.png" alt="Anomalies Dashboard"></p>
 
