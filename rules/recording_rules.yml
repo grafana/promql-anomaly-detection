@@ -119,7 +119,7 @@ groups:
             )
           )
 
-      - record: anomaly:upper_band
+      - record: anomaly:lower_band
         expr: |-
           min without(look_back)
           (
