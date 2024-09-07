@@ -39,6 +39,7 @@
         "type": "prometheus",
         "uid": "webstore-metrics"
       },
+      "description": "Baselines provide upper and lower bands around time series data to identify anomalies. Values that remain outside the bands for significant periods of time will be identified as anomalies.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -407,6 +408,7 @@
         "type": "prometheus",
         "uid": "webstore-metrics"
       },
+      "description": "The mid-line is calculated using a moving average over a 1 hour time window. It follows the trend while removing noise. Baselines are defined above and below the mid-line.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -551,6 +553,7 @@
         "type": "prometheus",
         "uid": "default"
       },
+      "description": "The standard deviation over a 1 hour time window is used as the basis for calculating the width of the upper and lower bands. A high pass filter is applied to remove periods of low variability. The high pass filter uses the coefficient of variation to define a threshold that  is applicable to any time series (as the threshold depends on the magnitude of the time series's values). The high pass filter has the effect of increasing the sensitivity of the bands and improving their overall stability.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -695,6 +698,7 @@
         "type": "prometheus",
         "uid": "default"
       },
+      "description": "The filtered standard deviation over a 1 hour time window is smoothed over a 26 hour period using a moving average. This creates stable and robust bands that adapt to increased variability in a controlled way, especially in the presence of spikes.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -855,6 +859,7 @@
         "type": "prometheus",
         "uid": "webstore-metrics"
       },
+      "description": "The smoothed filtered standard deviation is used to calculate the final short term upper and lower bands. This is done by scaling it by a certain factor and adding it to (or subtracting it from) the mid-line.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1051,6 +1056,7 @@
         "type": "prometheus",
         "uid": "default"
       },
+      "description": "Margin bands complement short term bands in situations where short term bands are very narrow or do not exist at all (have been removed by the high pass filter). This can happen when the time series presents very low variability. They are purely based on the moving average over 1 hour, scaled by a certain factor.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1247,6 +1253,7 @@
         "type": "prometheus",
         "uid": "default"
       },
+      "description": "Seasonality uses past data to detect long term patterns and prevent recurrent events from triggering false positives. Their calculation is similar to the short term bands, but with an offset (1 day, 1 week).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1482,7 +1489,7 @@
       },
       "id": 15,
       "panels": [],
-      "title": "Approach Comparison",
+      "title": "Short Term Approach Comparison",
       "type": "row"
     },
     {
@@ -2522,7 +2529,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "10s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
