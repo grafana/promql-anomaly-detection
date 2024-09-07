@@ -980,10 +980,6 @@
               {
                 "id": "custom.showPoints",
                 "value": "never"
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": "short_term_upper_band"
               }
             ]
           }
@@ -1174,10 +1170,6 @@
               "options": "anomaly:select"
             },
             "properties": [
-              {
-                "id": "custom.fillBelowTo",
-                "value": "margin_upper_band"
-              },
               {
                 "id": "custom.showPoints",
                 "value": "never"
@@ -1375,10 +1367,6 @@
               "options": "anomaly:select"
             },
             "properties": [
-              {
-                "id": "custom.fillBelowTo",
-                "value": "long_term_upper_band"
-              },
               {
                 "id": "custom.showPoints",
                 "value": "never"
@@ -1600,10 +1588,6 @@
             },
             "properties": [
               {
-                "id": "custom.fillBelowTo",
-                "value": "anomaly_upper_band"
-              },
-              {
                 "id": "custom.showPoints",
                 "value": "never"
               }
@@ -1824,10 +1808,6 @@
             },
             "properties": [
               {
-                "id": "custom.fillBelowTo",
-                "value": "anomaly_upper_band"
-              },
-              {
                 "id": "custom.showPoints",
                 "value": "never"
               }
@@ -2022,10 +2002,6 @@
               {
                 "id": "custom.showPoints",
                 "value": "never"
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": "short_term_upper_band"
               }
             ]
           }
@@ -2629,6 +2605,6 @@
   "timezone": "browser",
   "title": "Anomalies",
   "uid": "advzfvhalb94we",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
