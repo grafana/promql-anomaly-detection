@@ -28,9 +28,20 @@ You can simulate anomalies by altering the traffic patterns in the load generato
 
 ## Usage
 
-Any metric with the `anomaly_name` and `anomaly_type` labels set will be considered for anomaly detection. The `/examples` folder shows how recording rules could be used for such purposes. This allows defining custom aggregation dimensions for the bands, such as "service", "job", "instance" or any other label.
+In order to use the framework, you will need to copy the recording and alerting rules to a folder accessible by your Prometheus instance, and update
+your Prometheus configuration to use them.
 
-Anomaly bands can be overlayed on top of the original time series in Grafana, allowing for easy visualization of the detected anomalies. An example of dashboard can be found in the `demo/src/grafana/provisioning/dashboards/anomalies` folder.
+For example, you could add the following to your Prometheus config file:
+
+```yaml
+rule_files:
+- /etc/prometheus/rules/recording_rules.yml
+- /etc/prometheus/rules/alerts.yml
+```
+
+In addition, you will need recording (or relabel) rules that tag your existing metrics for anomaly detection. Any metric with the `anomaly_name` and `anomaly_type` labels set will be considered for anomaly detection. The `/examples` folder shows how recording rules could be used for such purposes.
+
+Anomaly bands can be overlayed on top of your original time series panels in Grafana, allowing for easy visualization of the detected anomalies. An example dashboard can be found in the `demo/src/grafana/provisioning/dashboards/anomalies` folder.
 
 The framework is designed to be extended and adapted to different uses cases, while providing a solid foundation for anomaly detection in time series data.
 
