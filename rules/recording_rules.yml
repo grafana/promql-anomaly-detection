@@ -98,7 +98,7 @@ groups:
   - name: AnomalyLongTerm
     interval: 5m
     rules:
-      - record: anomaly:upper_band
+      - record: anomaly:upper_band_lt
         expr: |-
           max without(look_back)
           (
@@ -119,7 +119,7 @@ groups:
             )
           )
 
-      - record: anomaly:lower_band
+      - record: anomaly:lower_band_lt
         expr: |-
           min without(look_back)
           (
