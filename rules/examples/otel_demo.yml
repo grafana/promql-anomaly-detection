@@ -7,25 +7,19 @@ groups:
       ################################################################################
 
       - record: anomaly:request:rate5m
-        expr: |-
-          label_replace(
-          label_replace(
-              sum(rate(duration_milliseconds_count{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])) by (job),
-          "anomaly_name", "otel_demo_requests", "", ""),
-          "anomaly_type", "request_rate", "", "")
+        expr: sum(rate(duration_milliseconds_count{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])) by (job)
+        labels:
+          anomaly_name: "otel_demo_requests"
+          anomaly_type: "request_rate"
 
       - record: anomaly:request:latency:p95
-        expr: |-
-          label_replace(
-          label_replace(
-              histogram_quantile(0.95, sum by (job, le) (rate(duration_milliseconds_bucket{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m]))),
-          "anomaly_name", "otel_demo_latency_p95", "", ""),
-          "anomaly_type", "latency", "", "")
+        expr: histogram_quantile(0.95, sum by (job, le) (rate(duration_milliseconds_bucket{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])))
+        labels:
+          anomaly_name: "otel_demo_latency_p95"
+          anomaly_type: "latency"
 
       - record: anomaly:request:errors
-        expr: |-
-          label_replace(
-          label_replace(
-              sum(rate(calls_total{status_code="STATUS_CODE_ERROR"} [5m])) by (job),
-          "anomaly_name", "otel_demo_errors", "", ""),
-          "anomaly_type", "errors", "", "")
+        expr: sum(rate(calls_total{status_code="STATUS_CODE_ERROR"} [5m])) by (job)
+        labels:
+          anomaly_name: "otel_demo_errors"
+          anomaly_type: "errors"

@@ -8,25 +8,23 @@ groups:
 
       - record: anomaly:resource:cpu
         expr: |-
-          label_replace(
-          label_replace(
-            (((count by (instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job))) 
-            - 
-            avg by (instance, job) (sum by (instance, mode, job)(irate(node_cpu_seconds_total{mode='idle',job=~"node_exporter"}[5m])))) * 100) 
-            / 
-            count by(instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job)),
-          "anomaly_name", "node_cpu", "", ""),
-          "anomaly_type", "resource", "", "")
+          (((count by (instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job))) 
+          -
+          avg by (instance, job) (sum by (instance, mode, job)(irate(node_cpu_seconds_total{mode='idle',job=~"node_exporter"}[5m])))) * 100) 
+          /
+          count by(instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job))
+        labels:
+          anomaly_name: "node_cpu"
+          anomaly_type: "resource"
 
       - record: anomaly:resource:memory
         expr: |-
-          label_replace(
-          label_replace(
-            100 -
-            (
-              avg by (instance, job) (node_memory_MemAvailable_bytes{job=~"node_exporter"}) /
-              avg by (instance, job) (node_memory_MemTotal_bytes{job=~"node_exporter"})
-            * 100
-            ),
-          "anomaly_name", "node_memory", "", ""),
-          "anomaly_type", "resource", "", "")
+          100 -
+          (
+            avg by (instance, job) (node_memory_MemAvailable_bytes{job=~"node_exporter"}) /
+            avg by (instance, job) (node_memory_MemTotal_bytes{job=~"node_exporter"})
+          * 100
+          )
+        labels:
+          anomaly_name: "node_memory"
+          anomaly_type: "resource"
