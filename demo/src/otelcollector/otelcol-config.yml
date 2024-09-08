@@ -1,5 +1,9 @@
-# Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
+# Provenance-includes-location: https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/otelcollector/otelcol-config.yml
+# Provenance-includes-license: Apache-2.0
+# Provenance-includes-copyright: The OpenTelemetry Authors.
+# Modifications [Grafana Labs]:
+# - Removed unnecessary parts for the purposes of this demo
 
 receivers:
   otlp:

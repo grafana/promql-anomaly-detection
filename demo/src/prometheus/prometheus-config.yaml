@@ -1,5 +1,10 @@
-# Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
+# Provenance-includes-location: https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/prometheus/prometheus-config.yaml
+# Provenance-includes-license: Apache-2.0
+# Provenance-includes-copyright: The OpenTelemetry Authors.
+# Modifications [Grafana Labs]:
+# - Scrape Prometheus's own metrics
+# - Add extra rule files
 
 global:
   evaluation_interval: 30s
