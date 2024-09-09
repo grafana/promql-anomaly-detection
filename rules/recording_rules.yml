@@ -6,18 +6,24 @@ groups:
       #                     Constants                                                #
       ################################################################################
 
+      # The threshold used for filtering low variability periods, in combination with
+      # the coefficient of variation.
       - record: anomaly:threshold_by_covar
         expr: |-
           0.5
 
+      # A threshold used to filter out sparse metrics, for which anomaly detection won't
+      # work correctly.
       - record: anomaly:sparse_threshold
         expr: |-
           5/60
 
+      # The stddev multiplier for short term and long term bands.
       - record: anomaly:stddev_multiplier
         expr: |-
           2
 
+      # The stddev multiplier for margin bands.
       - record: anomaly:margin_multiplier
         expr: |-
           0.5
@@ -26,6 +32,10 @@ groups:
       #                     Base Rules                                               #
       ################################################################################
 
+      # The framework will take as input any metric tagged with the labels "anomaly_name" and "anomaly_type".
+      # - "anomaly_name" uniquely identifies the metric within the anomaly detection framework.
+      # - "anomaly_type" can be used to define independent thresholds for each metric type.
+      # A filter is used to exclude metrics that are highly sparse.
       - record: anomaly:select
         expr: |-
           (
@@ -41,18 +51,31 @@ groups:
         labels:
           anomaly_select: 1
 
+      # The mid-line used used as the reference to calculate upper and lower bands.
+      # 1 hour is a good compromise between smoothness and responsiveness.
       - record: anomaly:avg_1h
         expr: |-
           avg_over_time(anomaly:select[1h])
 
+      # Stddev with a one hour time window and a high pass filter applied to it is used as the basis for
+      # anomaly detection.
+      # The stddev_1h acts as a measure of variability.
+      # The high pass filter is used to increase its sensitivity by focusing on periods of high variability. It's calculation
+      # is based on the coefficient of variation (relative standard deviation), which allows defining a threshold that
+      # will work for metrics of any magnitude.
       - record: anomaly:stddev_1h:filtered
         expr: |-
           stddev_over_time(anomaly:select[1h]) > anomaly:avg_1h * on() group_left anomaly:threshold_by_covar
 
+      # The filtered stddev_1h is smoothed over a 26 hour window to get the final short term bands. In combination with
+      # the filtered standard deviation, it provides robust and stable bands that expand gently in the presence of extreme outliers.
       - record: anomaly:stddev_st
         expr: |-
           avg_over_time(anomaly:stddev_1h:filtered[26h])
 
+      # Short term, margin and long term bands are combined to form the final bands used for anomaly detection.
+      # Margin bands provide minimum width bands and are purely based on the avg_1h. They act as a fallback band for periods in which
+      # short term bands do not exist due to very low variability.
       - record: anomaly:lower_band
         expr: |-
           clamp_min(
@@ -90,6 +113,11 @@ groups:
             last_over_time(anomaly:upper_band_lt[10m])
           )
 
+  # Long term bands are calculated by a different recording rule group with higher interval for efficiency reasons.
+  # They are based on the same principles as short term bands, but with a lookback offset. They can be easily be extended to
+  # incorporate other known seasonality patterns.
+  # In order to avoid replicating expanded bands for a long period of time, they only take a 1h time window for the stddev.
+  # TODO(@jcreixell): apply a gentle smoothing factor to prevent undesirable artifacts.
   - name: AnomalyLongTerm
     interval: 5m
     rules:
