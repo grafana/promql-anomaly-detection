@@ -29,8 +29,8 @@ groups:
       - record: anomaly:select
         expr: |-
           (
-            {anomaly_name!="", anomaly_type="request_rate", anomaly_select=""} > 0
-            unless avg_over_time({anomaly_name!="", anomaly_type="request_rate", anomaly_select=""}[1h]) < on() group_left anomaly:sparse_threshold
+            {anomaly_name!="", anomaly_type="requests", anomaly_select=""} > 0
+            unless avg_over_time({anomaly_name!="", anomaly_type="requests", anomaly_select=""}[1h]) < on() group_left anomaly:sparse_threshold
           )
           OR
           {anomaly_name!="", anomaly_type="latency", anomaly_select=""} > 0

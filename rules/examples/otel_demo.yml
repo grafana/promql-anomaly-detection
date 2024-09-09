@@ -10,7 +10,7 @@ groups:
         expr: sum(rate(duration_milliseconds_count{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])) by (job)
         labels:
           anomaly_name: "otel_demo_requests"
-          anomaly_type: "request_rate"
+          anomaly_type: "requests"
 
       - record: anomaly:request:latency:p95
         expr: histogram_quantile(0.95, sum by (job, le) (rate(duration_milliseconds_bucket{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])))
