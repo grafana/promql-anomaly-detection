@@ -39,7 +39,16 @@ rule_files:
 - /etc/prometheus/rules/alerts.yml
 ```
 
-In addition, you will need recording (or relabel) rules that tag your existing metrics for anomaly detection. Any metric with the `anomaly_name` and `anomaly_type` labels set will be considered for anomaly detection. The `/examples` folder shows how recording rules could be used for such purposes.
+In addition, you will need recording (or relabel) rules that tag your existing metrics for anomaly detection. Any metric with the `anomaly_name` and `anomaly_type` labels set will be considered for anomaly detection.
+
+- `anomaly_name`: The name of the anomaly metric. This is used uniquely identify metrics.
+- `anomaly_type`: It allows defining different thresholds and multipliers per metric type. The following types are supported by default:
+  - `requests`: The request rate for a given service.
+  - `latency`: The latency for a given service (for example, the 95th percentile).
+  - `errors`: The error rate for a given service.
+  - `resource`: A gauge representing a resource (for example, cpu or memory usage).
+
+The `/examples` folder shows how recording rules could be used for such purposes.
 
 Anomaly bands can be overlayed on top of your original time series panels in Grafana, allowing for easy visualization of the detected anomalies. An example dashboard can be found in the `demo/src/grafana/provisioning/dashboards/anomalies` folder.
 
