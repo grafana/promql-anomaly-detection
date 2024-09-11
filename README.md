@@ -4,7 +4,8 @@ Framework for anomaly detection in time series data using Prometheus/PromQL.
 
   - Does not require external systems.
   - Performant at scale.
-  - Designed to minimize false positives.
+  - Simple yet powerful.
+  - Extensible.
 
 
 ## Getting Started
