@@ -60,7 +60,7 @@ The framework is composed of two main components: a set of base recording rules 
 
 ### Recording Rules
 
-The recording rules use a combination of average and standard deviation over time to generate the bands. Smoothing is applied to the bands to reduce false positives and improve the stability of the bands in the presence of extreme outliers. In addition, a high pass filter is applied pre-smoothing to remove low frequency samples, increasing the sensitivity of the bands.
+The recording rules use a combination of average and standard deviation over time to generate the bands. Smoothing is applied to the bands to increase robustness and improve the stability of the bands in the presence of extreme outliers. In addition, a high pass filter is applied pre-smoothing to remove low variability periods, increasing the sensitivity of the bands.
 
 Seasonality is also incorporated into the bands, allowing the bands to adapt to recurrent patterns happening daily or weekly. Custom seasonality patterns can be added easily.
 
