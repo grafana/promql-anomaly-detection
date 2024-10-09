@@ -249,7 +249,7 @@ services:
 
   # Frontend Proxy (Envoy)
   frontendproxy:
-    image: ${IMAGE_NAME}:${DEMO_VERSION}-frontendproxy
+    image: promql-anomaly-detection-frontendproxy
     container_name: frontend-proxy
     build:
       context: ./
