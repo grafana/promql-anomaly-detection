@@ -11,7 +11,7 @@ datasources:
   - name: Prometheus
     uid: webstore-metrics
     type: prometheus
-    url: http://localhost:8080/prometheus
+    url: http://prometheus:9090/prometheus
     editable: true
     isDefault: true
     jsonData:
