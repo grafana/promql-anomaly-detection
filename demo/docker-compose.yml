@@ -44,6 +44,7 @@ services:
     environment:
       - AD_SERVICE_PORT
       - FLAGD_HOST
+      - FLAGD_PORT
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://${OTEL_COLLECTOR_HOST}:${OTEL_COLLECTOR_PORT_HTTP}
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
@@ -51,6 +52,8 @@ services:
       - OTEL_SERVICE_NAME=adservice
     depends_on:
       otelcol:
+        condition: service_started
+      flagd:
         condition: service_started
     logging: *logging
 
@@ -162,7 +165,8 @@ services:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-emailservice
     container_name: email-service
     build:
-      context: ./src/emailservice
+      context: ./
+      dockerfile: ${EMAIL_SERVICE_DOCKERFILE}
       cache_from:
         - ${IMAGE_NAME}:${IMAGE_VERSION}-emailservice
     deploy:
@@ -182,6 +186,7 @@ services:
       otelcol:
         condition: service_started
     logging: *logging
+
 
   # Frontend
   frontend:

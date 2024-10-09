@@ -11,7 +11,7 @@ datasources:
   - name: Prometheus
     uid: webstore-metrics
     type: prometheus
-    url: http://prometheus:9090/prometheus
+    url: http://localhost:8080/prometheus
     editable: true
     isDefault: true
     jsonData:
@@ -19,7 +19,3 @@ datasources:
       exemplarTraceIdDestinations:
         - datasourceUid: webstore-traces
           name: trace_id
-
-        - url: http://localhost:8080/jaeger/ui/trace/$${__value.raw}
-          name: trace_id
-          urlDisplayLabel: View in Jaeger UI
