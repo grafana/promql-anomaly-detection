@@ -12,7 +12,8 @@ DOCKER_COMPOSE_ENV=--env-file .env
 
 .PHONY: start
 start:
-	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) -f docker-compose.yml up --force-recreate --remove-orphans --detach
+	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) build frontendproxy
+	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) up --force-recreate --remove-orphans --detach
 	@echo ""
 	@echo "PromQL Anomaly Detection Demo is running."
 	@echo "Go to http://localhost:8080 for the demo UI."
