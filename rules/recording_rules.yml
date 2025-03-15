@@ -134,7 +134,7 @@ groups:
             )
             or
             label_replace(
-                avg_over_time(anomaly:avg_1h[1h] offset 23h30m)
+                avg_over_time(anomaly:select[1h] offset 23h30m)
                 +
                 stddev_over_time(anomaly:select[1h] offset 23h30m)
                         * on() group_left anomaly:stddev_multiplier,
