@@ -18,6 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -30,7 +31,8 @@
       },
       "id": 10,
       "panels": [],
-      "title": "Baselines",
+      "repeat": "anomaly_strategy",
+      "title": "$anomaly_strategy strategy",
       "type": "row"
     },
     {
@@ -67,7 +69,7 @@
               "fill": "solid"
             },
             "lineWidth": 1,
-            "pointSize": 5,
+            "pointSize": 1,
             "scaleDistribution": {
               "type": "linear"
             },
@@ -131,25 +133,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#73BF69",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "anomaly_lower_band"
             },
             "properties": [
@@ -167,6 +150,31 @@
               {
                 "id": "custom.showPoints",
                 "value": "never"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "level"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#686e67",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
               }
             ]
           },
@@ -202,6 +210,21 @@
                   "fixedColor": "super-light-yellow",
                   "mode": "fixed"
                 }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-green",
+                  "mode": "fixed"
+                }
               },
               {
                 "id": "custom.showPoints",
@@ -213,7 +236,7 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 19,
+        "w": 24,
         "x": 0,
         "y": 1
       },
@@ -230,7 +253,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0-75425",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -238,7 +261,8 @@
             "uid": "default"
           },
           "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
+          "expr": "{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", anomaly_select=\"\", anomaly_strategy=\"$anomaly_strategy\"}",
+          "hide": false,
           "legendFormat": "{{anomaly_name}}",
           "range": true,
           "refId": "A"
@@ -249,7 +273,7 @@
             "uid": "default"
           },
           "editorMode": "code",
-          "expr": "last_over_time(anomaly:lower_band{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m])",
+          "expr": "last_over_time(anomaly:lower_band{job=\"$job\", anomaly_name=\"$anomaly_name\", anomaly_strategy=\"$anomaly_strategy\", instance=~\"$instance\"}[2m])",
           "hide": false,
           "instant": false,
           "legendFormat": "anomaly_lower_band",
@@ -262,7 +286,7 @@
             "uid": "default"
           },
           "editorMode": "code",
-          "expr": "last_over_time(anomaly:upper_band{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m])",
+          "expr": "last_over_time(anomaly:upper_band{job=\"$job\", anomaly_name=\"$anomaly_name\", anomaly_strategy=\"$anomaly_strategy\", instance=~\"$instance\"}[2m])",
           "hide": false,
           "instant": false,
           "legendFormat": "anomaly_upper_band",
@@ -275,2244 +299,39 @@
             "uid": "webstore-metrics"
           },
           "editorMode": "code",
-          "expr": "ALERTS{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", alertstate=\"firing\", anomaly_select=\"1\"}",
+          "expr": "ALERTS{job=\"$job\", anomaly_name=\"$anomaly_name\", anomaly_strategy=\"$anomaly_strategy\", instance=~\"$instance\", alertstate=\"firing\", anomaly_select=\"1\"}",
           "hide": false,
           "instant": false,
           "legendFormat": "anomalies",
           "range": true,
           "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "webstore-metrics"
+          },
+          "editorMode": "code",
+          "expr": "anomaly:level{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\", anomaly_strategy=\"$anomaly_strategy\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "level",
+          "range": true,
+          "refId": "E"
         }
       ],
       "title": "Baselines",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "default"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 5,
-        "x": 19,
-        "y": 1
-      },
-      "id": 9,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.2.0",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "anomaly:stddev_multiplier",
-          "legendFormat": "stddev_multiplier",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:margin_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "margin_multiplier",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:threshold_by_covar",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "threshold_by_covar",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:sparse_threshold",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "sparse_threshold",
-          "range": true,
-          "refId": "D"
-        }
-      ],
-      "title": "Constants",
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 11
-      },
-      "id": 11,
-      "panels": [],
-      "title": "Explanation",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "webstore-metrics"
-      },
-      "description": "The mid-line is calculated using a moving average over a 1 hour time window. It follows the trend while removing noise. Baselines are defined above and below the mid-line.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:avg_1h"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 0,
-        "y": 12
-      },
-      "id": 2,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "avg_1h",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "1. Mid-line (avg over 1h)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "default"
-      },
-      "description": "The standard deviation over a 1 hour time window is used as the basis for calculating the width of the upper and lower bands. A high pass filter is applied to remove periods of low variability. The high pass filter uses the coefficient of variation to define a threshold that  is applicable to any time series (as the threshold depends on the magnitude of the time series's values). The high pass filter has the effect of increasing the sensitivity of the bands and improving their overall stability.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "stddev_1h_filtered"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 8,
-        "y": 12
-      },
-      "id": 21,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:stddev_1h:filtered{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "stddev_1h_filtered",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "2. Stddev over 1h + High Pass Filter",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "default"
-      },
-      "description": "The filtered standard deviation over a 1 hour time window is smoothed over a 26 hour period using a moving average. This creates stable and robust bands that adapt to increased variability in a controlled way, especially in the presence of spikes.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:stddev_st"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "stddev_1h_over_26h"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 16,
-        "y": 12
-      },
-      "id": 19,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "stddev_1h_over_26h",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "3. Smooth over 26h",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "webstore-metrics"
-      },
-      "description": "The smoothed filtered standard deviation is used to calculate the final short term upper and lower bands. This is done by scaling it by a certain factor and adding it to (or subtracting it from) the mid-line.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "short_term_upper_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 10
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": "short_term_lower_band"
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "short_term_lower_band"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 0,
-        "y": 22
-      },
-      "id": 8,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + last_over_time(anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "short_term_upper_band",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - last_over_time(anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "short_term_lower_band",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "4. Short term bands",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "default"
-      },
-      "description": "Margin bands complement short term bands in situations where short term bands are very narrow or do not exist at all (have been removed by the high pass filter). This can happen when the time series presents very low variability. They are purely based on the moving average over 1 hour, scaled by a certain factor.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "margin_upper_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 10
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": "margin_lower_band"
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "margin_lower_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 8,
-        "y": 22
-      },
-      "id": 7,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:margin_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "margin_lower_band",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:margin_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "margin_upper_band",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "5. Margin bands",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "default"
-      },
-      "description": "Seasonality uses past data to detect long term patterns and prevent recurrent events from triggering false positives. Their calculation is similar to the short term bands, but with an offset (1 day, 1 week).",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "long_term_upper_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 10
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": "long_term_lower_band"
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "long_term_lower_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 0
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "long_term_lower_threshold"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "long_term_upper_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 16,
-        "y": 22
-      },
-      "id": 12,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "max(last_over_time(anomaly:upper_band_lt{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[10m])) by (anomaly_name)",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "long_term_upper_band",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "min(last_over_time(anomaly:lower_band_lt{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[10m])) by (anomaly_name)",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "long_term_lower_band",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "6. Seasonality",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 32
-      },
-      "id": 15,
-      "panels": [],
-      "title": "Short Term Approach Comparison",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "webstore-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly_upper_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 10
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": "anomaly_lower_band"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly_lower_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 0,
-        "y": 33
-      },
-      "id": 17,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - last_over_time(anomaly:stddev_26h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "anomaly_lower_band",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + last_over_time(anomaly:stddev_26h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "anomaly_upper_band",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "Bands: Stddev over 26h",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "webstore-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly_upper_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 10
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": "anomaly_lower_band"
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly_lower_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 0
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 8,
-        "y": 33
-      },
-      "id": 18,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - last_over_time(anomaly:stddev_1h:avg_26h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "anomaly_lower_band",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + last_over_time(anomaly:stddev_1h:avg_26h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "anomaly_upper_band",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "Bands: Smooth Stddev over 1h",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "default"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "short_term_upper_band"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 10
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": "short_term_lower_band"
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "short_term_lower_band"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0.1
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 16,
-        "y": 33
-      },
-      "id": 16,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) + last_over_time(anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "short_term_upper_band",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "last_over_time(anomaly:avg_1h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) - last_over_time(anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}[2m]) * on() group_left anomaly:stddev_multiplier",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "short_term_lower_band",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "Bands: Smooth + High Pass Filter",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "webstore-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "stddev_26h"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 0,
-        "y": 43
-      },
-      "id": 20,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:stddev_26h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "stddev_26h",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Stddev over 26h",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "webstore-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:stddev_1h:avg_26h"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 8,
-        "y": 43
-      },
-      "id": 22,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:stddev_1h:avg_26h{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "stddev_1h:avg_26h",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Smooth Stddev over 1h",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "webstore-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "stddev_st"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "anomaly:select"
-            },
-            "properties": [
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 16,
-        "y": 43
-      },
-      "id": 23,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0-75425",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:select{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "legendFormat": "{{anomaly_name}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "default"
-          },
-          "editorMode": "code",
-          "expr": "anomaly:stddev_st{job=\"$job\", anomaly_name=\"$anomaly_name\", instance=~\"$instance\"}",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "stddev_st",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Smooth Stddev over 1h + High Pass Filter",
-      "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "10s",
-  "schemaVersion": 39,
+  "schemaVersion": 40,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
           "text": "frontend",
           "value": "frontend"
         },
@@ -2522,10 +341,8 @@
         },
         "definition": "label_values({anomaly_name=~\".+\"},job)",
         "description": "",
-        "hide": 0,
         "includeAll": false,
         "label": "job",
-        "multi": false,
         "name": "job",
         "options": [],
         "query": {
@@ -2535,13 +352,10 @@
         },
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
         "current": {
-          "selected": false,
           "text": "otel_demo_requests",
           "value": "otel_demo_requests"
         },
@@ -2550,9 +364,7 @@
           "uid": "webstore-metrics"
         },
         "definition": "label_values({job=\"$job\"},anomaly_name)",
-        "hide": 0,
         "includeAll": false,
-        "multi": false,
         "name": "anomaly_name",
         "options": [],
         "query": {
@@ -2562,14 +374,34 @@
         },
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "adaptive",
+          "value": "adaptive"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "webstore-metrics"
+        },
+        "definition": "label_values({job=\"$job\"},anomaly_strategy)",
+        "includeAll": true,
+        "label": "anomaly_strategy",
+        "name": "anomaly_strategy",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({job=\"$job\"},anomaly_strategy)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
         "type": "query"
       },
       {
         "current": {
           "isNone": true,
-          "selected": false,
           "text": "None",
           "value": ""
         },
@@ -2578,10 +410,8 @@
           "uid": "webstore-metrics"
         },
         "definition": "label_values({job=\"$job\", anomaly_name=\"$anomaly_name\"},instance)",
-        "hide": 0,
         "includeAll": false,
         "label": "instance",
-        "multi": false,
         "name": "instance",
         "options": [],
         "query": {
@@ -2591,8 +421,6 @@
         },
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       }
     ]
@@ -2604,7 +432,7 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "Anomalies",
-  "uid": "advzfvhalb94we",
-  "version": 2,
+  "uid": "5f3fa6e3b06f49",
+  "version": 1,
   "weekStart": ""
 }

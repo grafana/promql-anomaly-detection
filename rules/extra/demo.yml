@@ -4,14 +4,14 @@ groups:
   - name: AnomalyExtraDemoRules
     rules:
 
-      - record: anomaly:stddev_26h
+      - record: anomaly:adaptive:stddev_26h
         expr: |-
-          stddev_over_time(anomaly:select[26h])
+          stddev_over_time(anomaly:adaptive:select[26h])
 
-      - record: anomaly:stddev_1h
+      - record: anomaly:adaptive:stddev_1h
         expr: |-
-          stddev_over_time(anomaly:select[1h])
+          stddev_over_time(anomaly:adaptive:select[1h])
 
-      - record: anomaly:stddev_1h:avg_26h
+      - record: anomaly:adaptive:stddev_1h:avg_26h
         expr: |-
-          avg_over_time(anomaly:stddev_1h[26h])
+          avg_over_time(anomaly:adaptive:stddev_1h[26h])

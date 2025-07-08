@@ -1,0 +1,172 @@
+groups:
+- name: AnomalyRobust
+  interval: 1m
+  rules:
+
+    ################################################################################
+    #                     Constants                                                #
+    ################################################################################
+
+    - record: anomaly:robust:mad_multiplier
+      expr: |-
+        2
+
+    - record: anomaly:robust:margin_multiplier
+      expr: |-
+        0.5
+
+    - record: anomaly:robust:sparse_threshold
+      expr: |-
+        5/60
+
+    ################################################################################
+    #                     Base Rules                                               #
+    ################################################################################
+
+    - record: anomaly:robust:select
+      expr: |-
+        (
+          {anomaly_name!="", anomaly_type="requests", anomaly_select="", anomaly_strategy="robust"} > 0
+          unless avg_over_time({anomaly_name!="", anomaly_type="requests", anomaly_select="", anomaly_strategy="robust"}[1h])
+                 < on() group_left anomaly:robust:sparse_threshold
+        )
+        OR
+        {anomaly_name!="", anomaly_type="latency", anomaly_select="", anomaly_strategy="robust"} > 0
+        OR
+        {anomaly_name!="", anomaly_type="errors", anomaly_select="", anomaly_strategy="robust"} > 0
+        OR
+        {anomaly_name!="", anomaly_type="resource", anomaly_select="", anomaly_strategy="robust"} > 0
+        OR
+        {anomaly_name!="", anomaly_select="", anomaly_strategy="robust"} > 0
+      labels:
+        anomaly_select: "1"
+
+    # Median over 24h as more stable reference
+    - record: anomaly:robust:median_lt
+      expr: quantile_over_time(0.5, anomaly:robust:select[1d])
+
+    # Absolute deviation from median
+    - record: anomaly:robust:abs_dev_lt
+      expr: abs(anomaly:robust:select - anomaly:robust:median_lt)
+
+    # Approximate MAD using 0.5 quantile of absolute deviation from median
+    - record: anomaly:robust:mad_lt
+      expr: quantile_over_time(0.5, anomaly:robust:abs_dev_lt[1d])
+
+    # Fallback margin band (proportional to median)
+    - record: anomaly:robust:lower_band_margin
+      expr: anomaly:robust:median_lt * on() group_left anomaly:robust:margin_multiplier
+
+    - record: anomaly:robust:upper_band_margin
+      expr: anomaly:robust:median_lt * on() group_left anomaly:robust:margin_multiplier
+
+    # The metric used to compare against the baselines to detect anomalies.
+    - record: anomaly:level
+      expr: quantile_over_time(0.5, anomaly:robust:select[1h])
+
+    # Final Lower Band
+    - record: anomaly:lower_band
+      expr: |-
+        clamp_min(
+          min without(prediction_type) (
+            label_replace(
+              last_over_time(anomaly:robust:median_lt[2m]) - last_over_time(anomaly:robust:mad_lt[2m]) * on() group_left anomaly:robust:mad_multiplier,
+              "prediction_type", "short_term", "", ""
+            )
+            or
+            label_replace(
+              last_over_time(anomaly:robust:median_lt[2m]) - last_over_time(anomaly:robust:lower_band_margin[2m]),
+              "prediction_type", "margin", "", ""
+            )
+            or
+            last_over_time(anomaly:robust:lower_seasonality_band[10m])
+          ),
+          0
+        )
+
+    # Final Upper Band
+    - record: anomaly:upper_band
+      expr: |-
+        max without(prediction_type) (
+          label_replace(
+            last_over_time(anomaly:robust:median_lt[2m]) + last_over_time(anomaly:robust:mad_lt[2m]) * on() group_left anomaly:robust:mad_multiplier,
+            "prediction_type", "short_term", "", ""
+          )
+          or
+          label_replace(
+            last_over_time(anomaly:robust:median_lt[2m]) + last_over_time(anomaly:robust:upper_band_margin[2m]),
+            "prediction_type", "margin", "", ""
+          )
+          or
+          last_over_time(anomaly:robust:upper_seasonality_band[10m])
+        )
+
+- name: AnomalyRobustSeasonal
+  interval: 5m
+  rules:
+
+    - record: anomaly:robust:median_seasonality_1w
+      expr: quantile_over_time(0.5, anomaly:robust:select[1h] offset 167h45m)
+
+    - record: anomaly:robust:abs_dev_seasonality_1w
+      expr: abs(anomaly:robust:select offset 167h45m - anomaly:robust:median_seasonality_1w)
+
+    - record: anomaly:robust:mad_seasonality_1w
+      expr: >
+        quantile_over_time(0.5, anomaly:robust:abs_dev_seasonality_1w[1h])
+
+    - record: anomaly:robust:median_seasonality_1d
+      expr: quantile_over_time(0.5, anomaly:robust:select[1h] offset 23h45m)
+
+    - record: anomaly:robust:abs_dev_seasonality_1d
+      expr: abs(anomaly:robust:select offset 23h45m - anomaly:robust:median_seasonality_1d)
+
+    - record: anomaly:robust:mad_seasonality_1d
+      expr: >
+        quantile_over_time(0.5, anomaly:robust:abs_dev_seasonality_1d[1h])
+
+    - record: anomaly:robust:upper_seasonality_band
+      expr: |-
+        max without(look_back) (
+          label_replace(
+            anomaly:robust:median_seasonality_1w + anomaly:robust:mad_seasonality_1w * on() group_left anomaly:robust:mad_multiplier,
+            "look_back", "1w", "", ""
+          )
+          or
+          label_replace(
+            anomaly:robust:median_seasonality_1d + anomaly:robust:mad_seasonality_1d * on() group_left anomaly:robust:mad_multiplier,
+            "look_back", "1d", "", ""
+          )
+        )
+
+    - record: anomaly:robust:lower_seasonality_band
+      expr: |-
+        min without(look_back) (
+          label_replace(
+            anomaly:robust:median_seasonality_1w - anomaly:robust:mad_seasonality_1w * on() group_left anomaly:robust:mad_multiplier,
+            "look_back", "1w", "", ""
+          )
+          or
+          label_replace(
+            anomaly:robust:median_seasonality_1d - anomaly:robust:mad_seasonality_1d * on() group_left anomaly:robust:mad_multiplier,
+            "look_back", "1d", "", ""
+          )
+        )
+
+- name: AnomalyRobustAlerts
+  rules:
+
+    ################################################################
+    #                     Anomalies                                #
+    ################################################################
+
+    # Alert for anomalies based on standard deviation
+    - alert: AnomalyDetected
+      for: 5m
+      expr: >
+        last_over_time(anomaly:level[2m]) < last_over_time(anomaly:lower_band{anomaly_strategy="robust"}[2m])
+        or
+        last_over_time(anomaly:level[2m]) > last_over_time(anomaly:upper_band{anomaly_strategy="robust"}[2m])
+      labels:
+        severity: warning
+        anomaly_strategy: robust

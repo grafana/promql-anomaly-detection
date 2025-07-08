@@ -23,8 +23,6 @@ scrape_configs:
     - localhost:9090 # prometheus endpoint address
 
 rule_files:
-- /etc/prometheus/rules/recording_rules.yml
-- /etc/prometheus/rules/alerts.yml
-- /etc/prometheus/rules/examples/node_exporter.yml
-- /etc/prometheus/rules/examples/otel_demo.yml
+- /etc/prometheus/rules/*.yml
+- /etc/prometheus/rules/examples/*.yml
 - /etc/prometheus/rules/extra/demo.yml
