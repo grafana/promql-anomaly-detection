@@ -160,7 +160,7 @@ groups:
     #                     Anomalies                                #
     ################################################################
 
-    # Alert for anomalies based on standard deviation
+    # Alert for anomalies based on robust strategy
     - alert: AnomalyDetected
       for: 5m
       expr: >
