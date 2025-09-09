@@ -41,7 +41,7 @@ groups:
       labels:
         anomaly_select: "1"
 
-    # Median over 24h as more stable reference
+    # Median over 24h as stable reference
     - record: anomaly:robust:median_lt
       expr: quantile_over_time(0.5, anomaly:robust:select[1d])
 
