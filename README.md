@@ -19,13 +19,16 @@ make start
 
 You will need to have Docker installed to run the demo.  The demo will start a Prometheus instance, a Grafana instance, a node exporter instance and a version of the OTEL demo.
 
-Once everything is running, head to [http://localhost:8080/grafana](http://localhost:8080/grafana) to access the Grafana UI. From there, you will find a dashboard called "Anomalies" within the "Anomalies" Folder.
+Once everything is running, head to [http://localhost:8080/grafana](http://localhost:8080/grafana) to access the Grafana UI. From there, you will find a dashboard called "Anomalies" within the "Anomalies" folder.
 
 The demo dashboard shows how any metric tagged with the `anomaly_name` label will be used for anomaly detection and displayed in the dashboard.
 
 <p align="center"><img src="docs/sources/assets/dashboard.png" alt="Anomalies Dashboard"></p>
 
 You can simulate anomalies by altering the traffic patterns in the load generator, which can be accessed at [http://localhost:8080/loadgen/](http://localhost:8080/loadgen/).
+
+> [!IMPORTANT]
+> Most strategies require 24-26 hours of data to be fully trained. Until enough data is processed, anomaly bands may be more sensitive than otherwise expected.
 
 ## Usage
 
