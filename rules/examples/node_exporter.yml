@@ -1,14 +1,14 @@
 groups:
-  - name: AnomalyNodeExporter
+
+  ####################################################################################
+  #                     Node Exporter - Adaptive Strategy                            #
+  ####################################################################################
+
+  - name: AnomalyNodeExporterAdaptive
     rules:
-
-      ################################################################################
-      #                     Node Exporter                                            #
-      ################################################################################
-
       - record: anomaly:resource:cpu
         expr: |-
-          (((count by (instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job))) 
+          (((count by (instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job)))
           -
           avg by (instance, job) (sum by (instance, mode, job)(irate(node_cpu_seconds_total{mode='idle',job=~"node_exporter"}[5m])))) * 100) 
           /
@@ -16,6 +16,7 @@ groups:
         labels:
           anomaly_name: "node_cpu"
           anomaly_type: "resource"
+          anomaly_strategy: "adaptive"
 
       - record: anomaly:resource:memory
         expr: |-
@@ -28,3 +29,36 @@ groups:
         labels:
           anomaly_name: "node_memory"
           anomaly_type: "resource"
+          anomaly_strategy: "adaptive"
+
+
+  ####################################################################################
+  #                     Node Exporter - Robust Strategy                              #
+  ####################################################################################
+
+  - name: AnomalyNodeExporterRobust
+    rules:
+      - record: anomaly:resource:cpu
+        expr: |-
+          (((count by (instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job))) 
+          -
+          avg by (instance, job) (sum by (instance, mode, job)(irate(node_cpu_seconds_total{mode='idle',job=~"node_exporter"}[5m])))) * 100) 
+          /
+          count by(instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job))
+        labels:
+          anomaly_name: "node_cpu"
+          anomaly_type: "resource"
+          anomaly_strategy: "robust"
+
+      - record: anomaly:resource:memory
+        expr: |-
+          100 -
+          (
+            avg by (instance, job) (node_memory_MemAvailable_bytes{job=~"node_exporter"}) /
+            avg by (instance, job) (node_memory_MemTotal_bytes{job=~"node_exporter"})
+          * 100
+          )
+        labels:
+          anomaly_name: "node_memory"
+          anomaly_type: "resource"
+          anomaly_strategy: "robust"
