@@ -72,7 +72,7 @@ The framework is composed of two main components: a set of base recording rules 
 
 ### Recording Rules
 
-The recording rules use a set of different strategies to generate upper and lower bands. Typically, they use a combination of short term, long term and margin bands.
+The recording rules use a set of different strategies to generate upper and lower bounds, forming bands. Typically, they use a combination of short term, long term and margin bands to compose the final bands.
 
 Short term bands expand based on variability observed within a pre-defined period (typically 24-26 hours).
 
@@ -82,4 +82,4 @@ Margin bands provide a minimum band width when variability is too low.
 
 ### Alerting Rules
 
-Alerting rules are used to detect when a time series crosses the anomaly bands. They can be found in the `/rules` folder.
+Alerting rules are used to detect when a time series crosses the anomaly bands for a significant period of time.
