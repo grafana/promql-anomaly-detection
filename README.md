@@ -60,7 +60,7 @@ Optionally, the `anomaly_type` label can be used to define more granular per-typ
   - `errors`: The error rate for a given service.
   - `resource`: A gauge representing a resource (for example, cpu or memory usage).
 
-The `/examples` folder shows how recording rules can be used for selecting metrics to be used for anomaly detection.
+The `rules/examples` folder shows how recording rules can be used for selecting metrics to be used for anomaly detection.
 
 Anomaly bands can be overlayed on top of your original time series panels in Grafana, allowing for easy visualization of the detected anomalies. An example dashboard can be found in the `demo/src/grafana/provisioning/dashboards/anomalies` folder.
 
