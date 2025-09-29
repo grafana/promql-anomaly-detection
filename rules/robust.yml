@@ -109,7 +109,7 @@ groups:
       expr: quantile_over_time(0.5, anomaly:robust:select[1h] offset 167h45m)
 
     - record: anomaly:robust:abs_dev_seasonality_1w
-      expr: abs(anomaly:robust:select offset 167h45m - anomaly:robust:median_seasonality_1w)
+      expr: abs(anomaly:robust:select offset 167h45m - last_over_time(anomaly:robust:median_seasonality_1w[10m]))
 
     - record: anomaly:robust:mad_seasonality_1w
       expr: >
@@ -119,7 +119,7 @@ groups:
       expr: quantile_over_time(0.5, anomaly:robust:select[1h] offset 23h45m)
 
     - record: anomaly:robust:abs_dev_seasonality_1d
-      expr: abs(anomaly:robust:select offset 23h45m - anomaly:robust:median_seasonality_1d)
+      expr: abs(anomaly:robust:select offset 23h45m - last_over_time(anomaly:robust:median_seasonality_1d[10m]))
 
     - record: anomaly:robust:mad_seasonality_1d
       expr: >
@@ -129,12 +129,12 @@ groups:
       expr: |-
         max without(look_back) (
           label_replace(
-            anomaly:robust:median_seasonality_1w + anomaly:robust:mad_seasonality_1w * on() group_left anomaly:robust:mad_multiplier,
+            last_over_time(anomaly:robust:median_seasonality_1w[10m]) + last_over_time(anomaly:robust:mad_seasonality_1w[10m]) * on() group_left anomaly:robust:mad_multiplier,
             "look_back", "1w", "", ""
           )
           or
           label_replace(
-            anomaly:robust:median_seasonality_1d + anomaly:robust:mad_seasonality_1d * on() group_left anomaly:robust:mad_multiplier,
+            last_over_time(anomaly:robust:median_seasonality_1d[10m]) + last_over_time(anomaly:robust:mad_seasonality_1d[10m]) * on() group_left anomaly:robust:mad_multiplier,
             "look_back", "1d", "", ""
           )
         )
@@ -143,12 +143,12 @@ groups:
       expr: |-
         min without(look_back) (
           label_replace(
-            anomaly:robust:median_seasonality_1w - anomaly:robust:mad_seasonality_1w * on() group_left anomaly:robust:mad_multiplier,
+            last_over_time(anomaly:robust:median_seasonality_1w[10m]) - last_over_time(anomaly:robust:mad_seasonality_1w[10m]) * on() group_left anomaly:robust:mad_multiplier,
             "look_back", "1w", "", ""
           )
           or
           label_replace(
-            anomaly:robust:median_seasonality_1d - anomaly:robust:mad_seasonality_1d * on() group_left anomaly:robust:mad_multiplier,
+            last_over_time(anomaly:robust:median_seasonality_1d[10m]) - last_over_time(anomaly:robust:mad_seasonality_1d[10m]) * on() group_left anomaly:robust:mad_multiplier,
             "look_back", "1d", "", ""
           )
         )
