@@ -51,7 +51,7 @@ groups:
           OR
           {anomaly_name!="", anomaly_select="", anomaly_strategy=~"^$|adaptive"} > 0
         labels:
-          anomaly_select: 1
+          anomaly_select: "1"
           anomaly_strategy: adaptive
 
       # The mid-line used used as the reference to calculate upper and lower bands.
