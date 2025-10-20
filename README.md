@@ -10,6 +10,9 @@ Framework for anomaly detection in time series data using Prometheus/PromQL.
 
 ## Getting Started
 
+> [!WARNING]  
+The demo is provided for illustrative purposes only and should not be run in production environments.
+
 To see a demo of the framework in action, run the following commands:
 
 ```bash
