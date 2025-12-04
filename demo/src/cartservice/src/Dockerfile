@@ -15,7 +15,7 @@
 # limitations under the License.
 
 # https://mcr.microsoft.com/v2/dotnet/sdk/tags/list
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.302 AS builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.302@sha256:02fdc848bbda5d57d9211a72c99bd665b421206002d66b8bc2cc0b2297c227fa AS builder
 ARG TARGETARCH
 
 WORKDIR /usr/src/app/
@@ -30,7 +30,7 @@ RUN dotnet publish ./src/cartservice.csproj -v d -r linux-musl-$TARGETARCH --no-
 # -----------------------------------------------------------------------------
 
 # https://mcr.microsoft.com/v2/dotnet/runtime-deps/tags/list
-FROM mcr.microsoft.com/dotnet/runtime-deps:8.0.6-alpine3.20
+FROM mcr.microsoft.com/dotnet/runtime-deps:8.0.6-alpine3.20@sha256:ce27c5bb26805aeeb726ae50b2f17bf58bef3818aeb9e189d2b8b7e25fcd46dc
 
 WORKDIR /usr/src/app/
 COPY --from=builder /cartservice/ ./
