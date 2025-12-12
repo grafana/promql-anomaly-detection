@@ -1,4 +1,4 @@
-FROM cypress/included:10.3.1-typescript
+FROM cypress/included:10.3.1-typescript@sha256:e216789d532475884dd60426ff52c7f02ef08730a1736dcb3ec2eb5f2d41734e
 WORKDIR /app
 COPY ./src/frontend .
 RUN npm clean-install
