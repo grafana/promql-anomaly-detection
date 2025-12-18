@@ -3,7 +3,7 @@ brotli==1.2.0
 certifi==2024.7.4
 charset-normalizer==3.3.2
 click==8.1.7
-configargparse==1.7
+configargparse==1.7.1
 deprecated==1.2.14
 flask==3.0.0
 flask-basicauth==0.2.0
