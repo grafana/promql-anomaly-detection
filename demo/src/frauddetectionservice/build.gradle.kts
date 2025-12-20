@@ -39,7 +39,7 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-api:1.38.0")
     implementation("io.opentelemetry:opentelemetry-sdk:1.38.0")
     implementation("io.opentelemetry:opentelemetry-extension-annotations:1.18.0")
-    implementation("org.apache.logging.log4j:log4j-core:2.21.1")
+    implementation("org.apache.logging.log4j:log4j-core:2.25.3")
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("com.google.protobuf:protobuf-kotlin:${protobufVersion}")
     implementation("dev.openfeature:sdk:1.7.4")
