@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-FROM python:3.12-slim-bookworm as base
+FROM python:3.12-slim-bookworm@sha256:2db3d54b851289c3fdf380af6c3eb0db09b072060151fb344de80673e1b26f81 as base
 
 #
 # Fetch requirements
