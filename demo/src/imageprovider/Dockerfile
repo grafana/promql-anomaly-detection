@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-FROM nginx:1.27.0-otel
+FROM nginx:1.27.0-otel@sha256:4b1f896df9f04d104774212be385906d5228a8727445763266722cf76dcb2efd
 
 RUN apt-get update ; apt-get install lsb-release --no-install-recommends --no-install-suggests -y
 
