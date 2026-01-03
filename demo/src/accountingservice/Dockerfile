@@ -1,11 +1,11 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:39b1272ca9a951df21a72df91cba0344a1a01a9e85ae61c90cb4db059ac62388 AS base
 USER app
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:2c7794fef0107c1815193dc157ed3f8ca60eb504a439806a29b6f9bf1ce73679 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["/src/accountingservice/", "AccountingService/"]

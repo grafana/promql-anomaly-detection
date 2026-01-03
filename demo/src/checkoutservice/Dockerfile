@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-FROM golang:1.22-alpine AS builder
+FROM golang:1.22-alpine@sha256:1699c10032ca2582ec89a24a1312d986a3f094aed3d5c1147b19880afe40e052 AS builder
 
 WORKDIR /usr/src/app/
 
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     protoc -I ./pb ./pb/demo.proto --go_out=./ --go-grpc_out=./ \
     && go build -ldflags "-s -w" -o /go/bin/checkoutservice/ ./
 
-FROM alpine
+FROM alpine@sha256:865b95f46d98cf867a156fe4a135ad3fe50d2056aa3f25ed31662dff6da4eb62
 
 WORKDIR /usr/src/app/
 
