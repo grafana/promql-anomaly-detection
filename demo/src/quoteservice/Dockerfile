@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-FROM php:8.3-cli as base
+FROM php:8.3-cli@sha256:923d8c7f348a16137f879b6f49589f00e104bf3b2bbf7d22f03430fea0fc5f67 as base
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN chmod +x /usr/local/bin/install-php-extensions \
@@ -17,7 +17,7 @@ CMD php public/index.php
 USER www-data
 EXPOSE ${QUOTE_SERVICE_PORT}
 
-FROM composer:2.7 AS vendor
+FROM composer:2.7@sha256:cb3483dc851665462a66c59982577dfbbde0ae2059e8b5550c2f49f44b8c333e AS vendor
 
 WORKDIR /tmp/
 COPY ./src/quoteservice/composer.json .
