@@ -60,7 +60,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/open-feature/flagd-schemas v0.2.9-0.20240408192555-ea4f119d2bd7 // indirect
-	github.com/open-feature/flagd/core v0.9.2 // indirect
+	github.com/open-feature/flagd/core v0.13.1 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/twmb/murmur3 v1.1.8 // indirect
