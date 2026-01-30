@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-FROM node:20-alpine AS deps
+FROM node:20-alpine@sha256:09e2b3d9726018aecf269bd35325f46bf75046a643a66d28360ec71132750ec8 AS deps
 RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY ./src/frontend/package*.json ./
 RUN npm ci
 
-FROM node:20-alpine AS builder
+FROM node:20-alpine@sha256:09e2b3d9726018aecf269bd35325f46bf75046a643a66d28360ec71132750ec8 AS builder
 RUN apk add --no-cache libc6-compat protobuf-dev protoc
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -20,7 +20,7 @@ COPY ./src/frontend .
 RUN npm run grpc:generate
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:20-alpine@sha256:09e2b3d9726018aecf269bd35325f46bf75046a643a66d28360ec71132750ec8 AS runner
 WORKDIR /app
 RUN apk add --no-cache protobuf-dev protoc
 
