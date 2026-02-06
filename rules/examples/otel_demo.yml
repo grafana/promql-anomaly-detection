@@ -8,21 +8,21 @@ groups:
   - name: AnomalyOTELDemoSpanmetricsAdaptive
     rules:
       - record: anomaly:request:rate5m
-        expr: sum(rate(duration_milliseconds_count{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])) by (job)
+        expr: sum(rate(traces_span_metrics_duration_milliseconds_count{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])) by (job)
         labels:
           anomaly_name: "otel_demo_requests"
           anomaly_type: "requests"
           anomaly_strategy: "adaptive"
 
       - record: anomaly:request:latency:p95
-        expr: histogram_quantile(0.95, sum by (job, le) (rate(duration_milliseconds_bucket{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])))
+        expr: histogram_quantile(0.95, sum by (job, le) (rate(traces_span_metrics_duration_milliseconds_bucket{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])))
         labels:
           anomaly_name: "otel_demo_latency_p95"
           anomaly_type: "latency"
           anomaly_strategy: "adaptive"
 
       - record: anomaly:request:errors
-        expr: sum(rate(calls_total{status_code="STATUS_CODE_ERROR"} [5m])) by (job)
+        expr: sum(rate(traces_span_metrics_calls_total{status_code="STATUS_CODE_ERROR"} [5m])) by (job)
         labels:
           anomaly_name: "otel_demo_errors"
           anomaly_type: "errors"
@@ -36,21 +36,21 @@ groups:
   - name: AnomalyOTELDemoSpanmetricsRobust
     rules:
       - record: anomaly:request:rate5m
-        expr: sum(rate(duration_milliseconds_count{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])) by (job)
+        expr: sum(rate(traces_span_metrics_duration_milliseconds_count{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])) by (job)
         labels:
           anomaly_name: "otel_demo_requests"
           anomaly_type: "requests"
           anomaly_strategy: "robust"
 
       - record: anomaly:request:latency:p95
-        expr: histogram_quantile(0.95, sum by (job, le) (rate(duration_milliseconds_bucket{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])))
+        expr: histogram_quantile(0.95, sum by (job, le) (rate(traces_span_metrics_duration_milliseconds_bucket{span_kind=~"SPAN_KIND_SERVER|SPAN_KIND_CONSUMER"}[5m])))
         labels:
           anomaly_name: "otel_demo_latency_p95"
           anomaly_type: "latency"
           anomaly_strategy: "robust"
 
       - record: anomaly:request:errors
-        expr: sum(rate(calls_total{status_code="STATUS_CODE_ERROR"} [5m])) by (job)
+        expr: sum(rate(traces_span_metrics_calls_total{status_code="STATUS_CODE_ERROR"} [5m])) by (job)
         labels:
           anomaly_name: "otel_demo_errors"
           anomaly_type: "errors"
