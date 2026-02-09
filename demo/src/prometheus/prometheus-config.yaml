@@ -21,6 +21,7 @@ scrape_configs:
   static_configs:
   - targets:
     - localhost:9090 # prometheus endpoint address
+  metrics_path: /prometheus/metrics
 
 rule_files:
 - /etc/prometheus/rules/*.yml
