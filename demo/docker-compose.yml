@@ -29,11 +29,6 @@ services:
   adservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-adservice
     container_name: ad-service
-    build:
-      context: ./
-      dockerfile: ${AD_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-adservice
     deploy:
       resources:
         limits:
@@ -61,11 +56,6 @@ services:
   cartservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-cartservice
     container_name: cart-service
-    build:
-      context: ./
-      dockerfile: ${CART_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-cartservice
     deploy:
       resources:
         limits:
@@ -92,11 +82,6 @@ services:
   checkoutservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-checkoutservice
     container_name: checkout-service
-    build:
-      context: ./
-      dockerfile: ${CHECKOUT_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-checkoutservice
     deploy:
       resources:
         limits:
@@ -138,11 +123,6 @@ services:
   currencyservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-currencyservice
     container_name: currency-service
-    build:
-      context: ./
-      dockerfile: ${CURRENCY_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-currencyservice
     deploy:
       resources:
         limits:
@@ -164,11 +144,6 @@ services:
   emailservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-emailservice
     container_name: email-service
-    build:
-      context: ./
-      dockerfile: ${EMAIL_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-emailservice
     deploy:
       resources:
         limits:
@@ -192,11 +167,6 @@ services:
   frontend:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-frontend
     container_name: frontend
-    build:
-      context: ./
-      dockerfile: ${FRONTEND_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-frontend
     deploy:
       resources:
         limits:
@@ -292,11 +262,6 @@ services:
   imageprovider:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-imageprovider
     container_name: imageprovider
-    build:
-      context: ./
-      dockerfile: ${IMAGE_PROVIDER_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-imageprovider
     deploy:
       resources:
         limits:
@@ -319,11 +284,6 @@ services:
   loadgenerator:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-loadgenerator
     container_name: load-generator
-    build:
-      context: ./
-      dockerfile: ${LOAD_GENERATOR_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-loadgenerator
     deploy:
       resources:
         limits:
@@ -357,11 +317,6 @@ services:
   paymentservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-paymentservice
     container_name: payment-service
-    build:
-      context: ./
-      dockerfile: ${PAYMENT_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-paymentservice
     deploy:
       resources:
         limits:
@@ -385,11 +340,6 @@ services:
   productcatalogservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-productcatalogservice
     container_name: product-catalog-service
-    build:
-      context: ./
-      dockerfile: ${PRODUCT_CATALOG_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-productcatalogservice
     deploy:
       resources:
         limits:
@@ -413,11 +363,6 @@ services:
   quoteservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-quoteservice
     container_name: quote-service
-    build:
-      context: ./
-      dockerfile: ${QUOTE_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-quoteservice
     deploy:
       resources:
         limits:
@@ -441,11 +386,6 @@ services:
   recommendationservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-recommendationservice
     container_name: recommendation-service
-    build:
-      context: ./
-      dockerfile: ${RECOMMENDATION_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-recommendationservice
     deploy:
       resources:
         limits:
@@ -474,11 +414,6 @@ services:
   shippingservice:
     image: ${IMAGE_NAME}:${DEMO_VERSION}-shippingservice
     container_name: shipping-service
-    build:
-      context: ./
-      dockerfile: ${SHIPPING_SERVICE_DOCKERFILE}
-      cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-shippingservice
     deploy:
       resources:
         limits:
