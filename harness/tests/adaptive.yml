@@ -1,0 +1,50 @@
+fixture: fixtures/smoke
+rules:
+  - ../rules/adaptive.yml
+
+time_range:
+  start: 2025-01-01T00:00:00Z
+  end:   2025-01-01T00:30:00Z
+
+cases:
+  - description: threshold_by_covar constant is 0.5
+    query: 'anomaly:adaptive:threshold_by_covar'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - value: 0.5
+
+  - description: select produces series for tracked services
+    query: 'anomaly:adaptive:select'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: rolling average is computed
+    query: 'anomaly:adaptive:avg_1h'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: upper band is computed
+    query: 'anomaly:upper_band{anomaly_strategy="adaptive"}'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: lower band is computed
+    query: 'anomaly:lower_band{anomaly_strategy="adaptive"}'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: lower band is below upper band
+    query: 'anomaly:lower_band{anomaly_strategy="adaptive"} < anomaly:upper_band{anomaly_strategy="adaptive"}'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: upper band is above the rolling average
+    query: 'anomaly:upper_band{anomaly_strategy="adaptive"} > anomaly:adaptive:avg_1h'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1

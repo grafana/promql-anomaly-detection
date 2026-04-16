@@ -1,0 +1,50 @@
+fixture: fixtures/smoke
+rules:
+  - ../rules/robust.yml
+
+time_range:
+  start: 2025-01-01T00:00:00Z
+  end:   2025-01-01T00:30:00Z
+
+cases:
+  - description: mad_multiplier constant is 2
+    query: 'anomaly:robust:mad_multiplier'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - value: 2
+
+  - description: select produces series for tracked services
+    query: 'anomaly:robust:select'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: median is computed
+    query: 'anomaly:robust:median_lt'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: MAD is computed
+    query: 'anomaly:robust:mad_lt'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: upper band is computed
+    query: 'anomaly:upper_band{anomaly_strategy="robust"}'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: lower band is computed
+    query: 'anomaly:lower_band{anomaly_strategy="robust"}'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
+
+  - description: lower band is below upper band
+    query: 'anomaly:lower_band{anomaly_strategy="robust"} < anomaly:upper_band{anomaly_strategy="robust"}'
+    at: 2025-01-01T00:15:00Z
+    expect:
+      - min_series: 1
