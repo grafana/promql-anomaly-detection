@@ -99,7 +99,10 @@ groups:
                     "prediction_type", "margin", "", ""
                 )
                 or
-                last_over_time(anomaly:adaptive:lower_band_lt[10m])
+                label_replace(
+                    last_over_time(anomaly:adaptive:lower_band_lt[10m]),
+                    "prediction_type", "long_term", "", ""
+                )
             ),
             0
           )
@@ -118,7 +121,10 @@ groups:
                 "prediction_type", "margin", "", ""
             )
             or
-            last_over_time(anomaly:adaptive:upper_band_lt[10m])
+            label_replace(
+                last_over_time(anomaly:adaptive:upper_band_lt[10m]),
+                "prediction_type", "long_term", "", ""
+            )
           )
 
   # Long term bands are calculated by a different recording rule group with higher interval for efficiency reasons.

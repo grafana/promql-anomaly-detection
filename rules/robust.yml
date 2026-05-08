@@ -79,7 +79,10 @@ groups:
               "prediction_type", "margin", "", ""
             )
             or
-            last_over_time(anomaly:robust:lower_seasonality_band[10m])
+            label_replace(
+              last_over_time(anomaly:robust:lower_seasonality_band[10m]),
+              "prediction_type", "seasonality", "", ""
+            )
           ),
           0
         )
@@ -98,7 +101,10 @@ groups:
             "prediction_type", "margin", "", ""
           )
           or
-          last_over_time(anomaly:robust:upper_seasonality_band[10m])
+          label_replace(
+            last_over_time(anomaly:robust:upper_seasonality_band[10m]),
+            "prediction_type", "seasonality", "", ""
+          )
         )
 
 - name: AnomalyRobustSeasonal
