@@ -6,7 +6,7 @@ The harness evaluates recording rule chains against captured TSDB fixtures and c
 
 **The challenge.** Recording rules depend on each other. `anomaly:upper_band` depends on `anomaly:robust:mad_lt`, which depends on `anomaly:robust:abs_dev_lt`, which depends on `anomaly:robust:select`, which depends on raw metrics from the OTel demo. You can't evaluate them in any order — you have to get the order right.
 
-**Step 1: the fixture.** Instead of scraping live metrics, we snapshot a small slice of real data from Prometheus into TSDB block files and commit them to the repo. That's the `fixtures/smoke/` directory. These are the raw ingredients — the input metrics the rules will be evaluated against.
+**Step 1: the fixture.** Instead of scraping live metrics, we snapshot a small slice of real data from Prometheus into TSDB block files and commit them to the repo. Fixtures live under `fixtures/` — each subdirectory is an independent snapshot. These are the raw ingredients — the input metrics the rules will be evaluated against.
 
 **Step 2: wave ordering.** Before evaluating anything, the harness reads all the rule files and builds a dependency graph — rule A references metric B, so A must come after B. It then sorts them into waves using Kahn's topological sort. The first wave has no dependencies (scalar constants like `0.5`). The next wave depends only on the fixture data. Each subsequent wave depends on the previous ones.
 
