@@ -12,6 +12,7 @@ DOCKER_COMPOSE_ENV=--env-file .env
 
 .PHONY: start
 start:
+	mkdir -p ./prometheus-data && chmod 777 ./prometheus-data
 	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) build frontendproxy
 	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) up --force-recreate --remove-orphans --detach
 	@echo ""
