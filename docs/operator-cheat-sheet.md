@@ -73,7 +73,8 @@ Confirm Graft reports **dashboard version** after save before refreshing.
 ```
 /etc/prometheus/rules/adaptive.yml
 /etc/prometheus/rules/robust.yml
-/etc/prometheus/rules/examples/powertech_hybrid.yml
+/etc/prometheus/rules/powertech_hybrid.yml    # must be in rules/ root (not only examples/)
+/etc/prometheus/rules/examples/*.yml         # requires rule_files line in prometheus.yml
 ```
 
 Reload: `curl -X POST http://localhost:9090/-/reload` (inside Prometheus network) or restart `prometheus` container.

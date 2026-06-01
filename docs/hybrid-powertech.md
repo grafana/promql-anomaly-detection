@@ -54,11 +54,12 @@ Load core strategies and both example sets:
 
 ```yaml
 rule_files:
-  - /etc/prometheus/rules/adaptive.yml
-  - /etc/prometheus/rules/robust.yml
-  - /etc/prometheus/rules/examples/powertech_hybrid.yml
-  # Optional: keep node_exporter.yml only if not duplicating powertech_hybrid infra section
+  - /etc/prometheus/machine*.yml
+  - /etc/prometheus/rules/*.yml
+  - /etc/prometheus/rules/examples/*.yml
 ```
+
+Copy [`rules/powertech_hybrid.yml`](../rules/powertech_hybrid.yml) to `rules/powertech_hybrid.yml` on the server (top-level `rules/` is required — `rules/*.yml` does **not** load subfolders). A full example config is in [`deploy/powertech-prometheus.yml`](../deploy/powertech-prometheus.yml).
 
 ## Grafana panel recipes
 
