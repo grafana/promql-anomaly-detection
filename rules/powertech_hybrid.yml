@@ -25,39 +25,66 @@ groups:
 
   - name: PowerTechMLAlerts
     rules:
+      # Breach must exceed 35% of the ML band width beyond the bound, fresh bounds, sustained 25m.
       - alert: PowerTechMLAboveUpperBound
         expr: |-
-          machine_metrics
-          > on (machine, field) group_left()
-          last_over_time(machine_metric_upper_bound[7m])
-        for: 5m
+          (
+            (
+              machine_metrics
+              - on (machine, field) group_left()
+              last_over_time(machine_metric_upper_bound[7m])
+            )
+            / on (machine, field) group_left()
+            clamp_min(
+              last_over_time(machine_metric_upper_bound[7m])
+              - last_over_time(machine_metric_lower_bound[7m]),
+              1e-6
+            )
+            > 0.35
+          )
+          and on (machine, field)
+          (time() - timestamp(machine_metric_upper_bound) < 600)
+        for: 25m
         labels:
           severity: warning
           anomaly_source: ml_exporter
         annotations:
           summary: "PowerTech ML: {{ $labels.machine }} / {{ $labels.field }} above upper bound"
           description: >-
-            Actual value exceeded the ML upper bound for at least 5m.
+            Actual is more than 35% of the ML band width above the upper bound for at least 25m.
             Bounds refresh ~every 5m from the ML exporter; live actuals scrape ~15s.
 
       - alert: PowerTechMLBelowLowerBound
         expr: |-
-          machine_metrics
-          < on (machine, field) group_left()
-          last_over_time(machine_metric_lower_bound[7m])
-        for: 5m
+          (
+            (
+              last_over_time(machine_metric_lower_bound[7m])
+              - on (machine, field) group_left()
+              machine_metrics
+            )
+            / on (machine, field) group_left()
+            clamp_min(
+              last_over_time(machine_metric_upper_bound[7m])
+              - last_over_time(machine_metric_lower_bound[7m]),
+              1e-6
+            )
+            > 0.35
+          )
+          and on (machine, field)
+          (time() - timestamp(machine_metric_lower_bound) < 600)
+        for: 25m
         labels:
           severity: warning
           anomaly_source: ml_exporter
         annotations:
           summary: "PowerTech ML: {{ $labels.machine }} / {{ $labels.field }} below lower bound"
           description: >-
-            Actual value fell below the ML lower bound for at least 5m.
+            Actual is more than 35% of the ML band width below the lower bound for at least 25m.
 
       - alert: PowerTechMLBoundsStale
         expr: |-
           (time() - timestamp(machine_metric_upper_bound)) > 900
-        for: 10m
+        for: 20m
         labels:
           severity: warning
           anomaly_source: ml_exporter

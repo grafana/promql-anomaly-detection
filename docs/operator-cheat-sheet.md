@@ -46,8 +46,8 @@ powertech:ml_bounds_stale
 
 | Alert | Meaning |
 |-------|---------|
-| `PowerTechMLAboveUpperBound` | Actual above ML upper band 5m+ |
-| `PowerTechMLBelowLowerBound` | Actual below ML lower band 5m+ |
+| `PowerTechMLAboveUpperBound` | >35% of band width above upper, fresh bounds, 25m |
+| `PowerTechMLBelowLowerBound` | >35% of band width below lower, fresh bounds, 25m |
 | `PowerTechMLBoundsStale` | No fresh ML bound 15m+ — check ML exporter |
 | `AnomalyDetected` | Track 2 — framework band breach |
 
