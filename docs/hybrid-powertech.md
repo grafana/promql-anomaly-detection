@@ -84,6 +84,10 @@ See main [README](../README.md). Requires `anomaly_name` on the input series.
 3. Framework bands need **~24h** history before they stabilize; ML bands follow your **30d** training window.
 4. One dashboard can mix both panel types; label sections clearly for operators.
 
+## Quick reference
+
+See [operator-cheat-sheet.md](./operator-cheat-sheet.md) for a one-page operator guide.
+
 ## Graft / AI assistant
 
 When using Graft (vikshana-graft-app), ask explicitly:
