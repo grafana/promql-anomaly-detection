@@ -35,7 +35,7 @@ You can simulate anomalies by altering the traffic patterns in the load generato
 
 ## PowerTech hybrid (ML exporter + this framework)
 
-If you run a **RandomForest ML exporter** for plant/process metrics (`machine_metrics`, `machine_metric_upper_bound`, etc.) **and** want promql-anomaly-detection for host/infra series, use the [hybrid guide](docs/hybrid-powertech.md) and [`rules/examples/powertech_hybrid.yml`](rules/examples/powertech_hybrid.yml). Do not tag ML exporter metrics with `anomaly_name`.
+If you run a **RandomForest ML exporter** for plant/process metrics (`machine_metrics`, `machine_metric_upper_bound`, etc.) **and** want promql-anomaly-detection for host/infra series, use the [hybrid guide](docs/hybrid-powertech.md), the Python exporter in [`exporter/bridge.py`](exporter/bridge.py), and [`rules/examples/powertech_hybrid.yml`](rules/examples/powertech_hybrid.yml). Do not tag ML exporter metrics with `anomaly_name`.
 
 ## Usage
 

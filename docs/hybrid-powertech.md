@@ -48,6 +48,12 @@ This fork supports a **two-track** model: RandomForest bands from your ML export
 | PLC / module current, pressure, process fields | ML exporter | `machine_metrics` + `machine_metric_*` + `[6m]` lookback on bounds | `PowerTechMLAlerts` |
 | Host CPU/RAM, generic infra, OTel service metrics | promql-anomaly-detection | `anomaly:level` + `last_over_time(anomaly:*_band[2m])` | `AnomalyDetected` |
 
+## ML exporter source code
+
+The RandomForest exporter is **`exporter/bridge.py`** in this repo (copied from `~/ptw_data/Cloud/Docker/prometheus/bridge.py` on ElectraMet). Configure via environment variables — see [`exporter/README.md`](../exporter/README.md).
+
+For **peer-based** RF (Module 5 vs modules 1–4,6–8), see [`peer-rf-module5.md`](peer-rf-module5.md).
+
 ## Prometheus configuration
 
 Load core strategies and both example sets:
