@@ -24,10 +24,28 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
+def _load_influx_token() -> str:
+    token = os.environ.get("INFLUX_TOKEN", "").strip()
+    if token:
+        return token
+    candidates = [
+        os.environ.get("INFLUX_TOKEN_FILE", "").strip(),
+        "/secrets/influx_token",
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), ".influx_token"),
+    ]
+    for token_file in candidates:
+        if token_file and os.path.isfile(token_file):
+            with open(token_file, encoding="utf-8") as f:
+                found = f.read().strip()
+            if found:
+                return found
+    return ""
+
+
 INFLUX_HOST   = os.environ.get("INFLUX_HOST", "https://52.35.251.91:8086")
 INFLUX_ORG    = os.environ.get("INFLUX_ORG", "powertech")
 INFLUX_BUCKET = os.environ.get("INFLUX_BUCKET", "powertechdata")
-TOKEN         = os.environ.get("INFLUX_TOKEN", "")
+TOKEN         = _load_influx_token()
 INFLUX_URL    = f"{INFLUX_HOST.rstrip('/')}/api/v2/query?org={INFLUX_ORG}"
 MACHINE_COLUMN = "machine"
 TIME_COLUMN    = "_time"

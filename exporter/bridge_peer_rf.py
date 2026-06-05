@@ -41,10 +41,18 @@ if TYPE_CHECKING:
     )
 
 PEER_RF_INFLUX_MODEL = os.environ.get("PEER_RF_INFLUX_MODEL", "peer_rf")
-PEER_RF_CONFIG_PATH = os.environ.get(
-    "PEER_RF_CONFIG_PATH",
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "peer_rf_config.json"),
-)
+def _default_peer_rf_config_path() -> str:
+    for candidate in (
+        os.environ.get("PEER_RF_CONFIG_PATH", "").strip(),
+        "/app/peer_rf_config.json",
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "peer_rf_config.json"),
+    ):
+        if candidate and os.path.isfile(candidate):
+            return candidate
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "peer_rf_config.json")
+
+
+PEER_RF_CONFIG_PATH = _default_peer_rf_config_path()
 INFLUX_BATCH_SIZE = int(os.environ.get("PEER_RF_INFLUX_BATCH_SIZE", "400"))
 
 
