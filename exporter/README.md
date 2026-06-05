@@ -10,7 +10,22 @@ On EC2 the live copy is mounted into the `data_bridge` container:
 
 ```text
 ~/ptw_data/Cloud/Docker/prometheus/bridge.py
-~/ptw_data/Cloud/Docker/prometheus/prometheus.yml   # scrape job influxdb-bridge → data-bridge:8000
+~/ptw_data/Cloud/Docker/prometheus/bridge_peer_rf.py
+~/ptw_data/Cloud/Docker/prometheus/peer_rf_config.json
+~/ptw_data/Cloud/Docker/prometheus/.influx_token   # not in git — chmod 600
+~/ptw_data/Cloud/Docker/prometheus/prometheus.yml
+```
+
+`docker-compose.yml` should mount:
+
+```yaml
+volumes:
+  - .../bridge.py:/app/bridge.py
+  - .../bridge_peer_rf.py:/app/bridge_peer_rf.py
+  - .../peer_rf_config.json:/app/peer_rf_config.json
+  - .../.influx_token:/secrets/influx_token:ro
+environment:
+  - INFLUX_TOKEN_FILE=/secrets/influx_token
 ```
 
 **Source of truth should be this Git repo**, not only the Docker folder.

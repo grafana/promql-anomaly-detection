@@ -1,15 +1,103 @@
 {
   "machines": {
     "2406-176021": {
-      "target": "Module5_Current_A",
-      "peer_features": [
-        "Module1_Current_A",
-        "Module2_Current_A",
-        "Module3_Current_A",
-        "Module4_Current_A",
-        "Module6_Current_A",
-        "Module7_Current_A",
-        "Module8_Current_A"
+      "targets": [
+        {
+          "target": "Module1_Current_A",
+          "peer_features": [
+            "Module2_Current_A",
+            "Module3_Current_A",
+            "Module4_Current_A",
+            "Module5_Current_A",
+            "Module6_Current_A",
+            "Module7_Current_A",
+            "Module8_Current_A"
+          ]
+        },
+        {
+          "target": "Module2_Current_A",
+          "peer_features": [
+            "Module1_Current_A",
+            "Module3_Current_A",
+            "Module4_Current_A",
+            "Module5_Current_A",
+            "Module6_Current_A",
+            "Module7_Current_A",
+            "Module8_Current_A"
+          ]
+        },
+        {
+          "target": "Module3_Current_A",
+          "peer_features": [
+            "Module1_Current_A",
+            "Module2_Current_A",
+            "Module4_Current_A",
+            "Module5_Current_A",
+            "Module6_Current_A",
+            "Module7_Current_A",
+            "Module8_Current_A"
+          ]
+        },
+        {
+          "target": "Module4_Current_A",
+          "peer_features": [
+            "Module1_Current_A",
+            "Module2_Current_A",
+            "Module3_Current_A",
+            "Module5_Current_A",
+            "Module6_Current_A",
+            "Module7_Current_A",
+            "Module8_Current_A"
+          ]
+        },
+        {
+          "target": "Module5_Current_A",
+          "peer_features": [
+            "Module1_Current_A",
+            "Module2_Current_A",
+            "Module3_Current_A",
+            "Module4_Current_A",
+            "Module6_Current_A",
+            "Module7_Current_A",
+            "Module8_Current_A"
+          ]
+        },
+        {
+          "target": "Module6_Current_A",
+          "peer_features": [
+            "Module1_Current_A",
+            "Module2_Current_A",
+            "Module3_Current_A",
+            "Module4_Current_A",
+            "Module5_Current_A",
+            "Module7_Current_A",
+            "Module8_Current_A"
+          ]
+        },
+        {
+          "target": "Module7_Current_A",
+          "peer_features": [
+            "Module1_Current_A",
+            "Module2_Current_A",
+            "Module3_Current_A",
+            "Module4_Current_A",
+            "Module5_Current_A",
+            "Module6_Current_A",
+            "Module8_Current_A"
+          ]
+        },
+        {
+          "target": "Module8_Current_A",
+          "peer_features": [
+            "Module1_Current_A",
+            "Module2_Current_A",
+            "Module3_Current_A",
+            "Module4_Current_A",
+            "Module5_Current_A",
+            "Module6_Current_A",
+            "Module7_Current_A"
+          ]
+        }
       ]
     }
   }

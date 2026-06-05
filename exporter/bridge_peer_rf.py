@@ -57,7 +57,8 @@ INFLUX_BATCH_SIZE = int(os.environ.get("PEER_RF_INFLUX_BATCH_SIZE", "400"))
 
 
 @dataclass(frozen=True)
-class PeerRfMachineConfig:
+class PeerRfTargetConfig:
+    machine_id: str
     target: str
     peer_features: list[str]
 
@@ -71,53 +72,96 @@ class TrainingPlan:
     publish_prometheus: bool
 
 
-_PEER_RF_CACHE: dict[str, PeerRfMachineConfig] | None = None
+_PEER_RF_CACHE: list[PeerRfTargetConfig] | None = None
 
 
-def load_peer_rf_machines() -> dict[str, PeerRfMachineConfig]:
+def _parse_peer_rf_entries(machine_id: str, cfg: dict) -> list[PeerRfTargetConfig]:
+    machine_str = str(machine_id).strip()
+    entries: list[PeerRfTargetConfig] = []
+
+    def add_entry(target: str, peers: list) -> None:
+        target = str(target).strip()
+        if not target or not isinstance(peers, list):
+            return
+        peer_features = [str(p).strip() for p in peers if str(p).strip() and str(p).strip() != target]
+        if not peer_features:
+            return
+        entries.append(
+            PeerRfTargetConfig(
+                machine_id=machine_str,
+                target=target,
+                peer_features=peer_features,
+            )
+        )
+
+    targets = cfg.get("targets")
+    if isinstance(targets, list):
+        for item in targets:
+            if isinstance(item, dict):
+                add_entry(item.get("target", ""), item.get("peer_features") or [])
+
+    # Legacy single-target shape (one entry per machine).
+    legacy_target = str(cfg.get("target", "")).strip()
+    if legacy_target:
+        add_entry(legacy_target, cfg.get("peer_features") or [])
+
+    return entries
+
+
+def load_peer_rf_targets() -> list[PeerRfTargetConfig]:
     global _PEER_RF_CACHE
     if _PEER_RF_CACHE is not None:
         return _PEER_RF_CACHE
     path = PEER_RF_CONFIG_PATH
     if not os.path.isfile(path):
-        _PEER_RF_CACHE = {}
+        _PEER_RF_CACHE = []
         return _PEER_RF_CACHE
     try:
         with open(path, encoding="utf-8") as f:
             raw = json.load(f)
         machines = raw.get("machines") or {}
-        out: dict[str, PeerRfMachineConfig] = {}
+        out: list[PeerRfTargetConfig] = []
         for machine_id, cfg in machines.items():
             if not isinstance(cfg, dict):
                 continue
-            target = str(cfg.get("target", "")).strip()
-            peers = cfg.get("peer_features") or []
-            if not target or not isinstance(peers, list):
-                continue
-            out[str(machine_id).strip()] = PeerRfMachineConfig(
-                target=target,
-                peer_features=[str(p).strip() for p in peers if str(p).strip()],
-            )
+            out.extend(_parse_peer_rf_entries(machine_id, cfg))
         _PEER_RF_CACHE = out
-        print(f"[PEER-RF] Loaded config for {len(out)} machine(s) from {path}")
+        machines_count = len({e.machine_id for e in out})
+        print(
+            f"[PEER-RF] Loaded {len(out)} target(s) across {machines_count} machine(s) from {path}"
+        )
         return _PEER_RF_CACHE
     except Exception as e:
         print(f"[PEER-RF] Failed to load {path}: {e}")
-        _PEER_RF_CACHE = {}
+        _PEER_RF_CACHE = []
         return _PEER_RF_CACHE
+
+
+def load_peer_rf_machines() -> dict[str, list[PeerRfTargetConfig]]:
+    grouped: dict[str, list[PeerRfTargetConfig]] = {}
+    for entry in load_peer_rf_targets():
+        grouped.setdefault(entry.machine_id, []).append(entry)
+    return grouped
 
 
 def merge_field_roles_from_peer_config() -> dict[str, str]:
     roles: dict[str, str] = {}
-    for cfg in load_peer_rf_machines().values():
+    for cfg in load_peer_rf_targets():
         roles[cfg.target] = "target"
         for feat in cfg.peer_features:
             roles[feat] = "feature"
     return roles
 
 
-def get_peer_rf_plan(machine_str: str, wide_df: pd.DataFrame) -> TrainingPlan | None:
-    cfg = load_peer_rf_machines().get(machine_str)
+def get_peer_rf_plan(
+    machine_str: str,
+    wide_df: pd.DataFrame,
+    target_field: str,
+) -> TrainingPlan | None:
+    cfg = next(
+        (e for e in load_peer_rf_targets() if e.machine_id == machine_str and e.target == target_field),
+        None,
+    )
     if not cfg:
         return None
     time_cols = {"hour", "minute"}
@@ -130,7 +174,7 @@ def get_peer_rf_plan(machine_str: str, wide_df: pd.DataFrame) -> TrainingPlan | 
         if tc in available and tc not in features:
             features.append(tc)
     if not features:
-        print(f"[PEER-RF] {machine_str}: no peer feature columns available")
+        print(f"[PEER-RF] {machine_str}/{cfg.target}: no peer feature columns available")
         return None
     excluded = [c for c in wide_df.columns if c not in features and c not in {cfg.target} and c not in time_cols]
     return TrainingPlan(
@@ -209,9 +253,10 @@ def publish_backfill_series(
     return written
 
 
-def train_peer_rf_machine(
+def _train_peer_rf_target(
     machine_str: str,
-    df: pd.DataFrame,
+    wide_df: pd.DataFrame,
+    target_field: str,
     n_estimators: int,
     max_depth: int,
     timestamp_ms: int | None,
@@ -221,16 +266,12 @@ def train_peer_rf_machine(
     build_matrices_fn: Any,
     fit_model_fn: Any,
     calculate_bounds_fn: Any,
-    prepare_wide_fn: Any,
     std_multiplier: float,
     min_std_dev: float,
     sample_residual_size: int,
-    write_series: bool = False,
+    write_series: bool,
 ) -> int:
-    wide_df = prepare_wide_fn(df)
-    if wide_df is None:
-        return 0
-    plan = get_peer_rf_plan(machine_str, wide_df)
+    plan = get_peer_rf_plan(machine_str, wide_df, target_field)
     if plan is None:
         return 0
     X, Y = build_matrices_fn(wide_df, plan.targets, plan.features)
@@ -265,6 +306,58 @@ def train_peer_rf_machine(
         influx_model=plan.influx_model,
         publish_prometheus=plan.publish_prometheus,
     )
+
+
+def train_peer_rf_machine(
+    machine_str: str,
+    df: pd.DataFrame,
+    n_estimators: int,
+    max_depth: int,
+    timestamp_ms: int | None,
+    *,
+    publish_fn: Any,
+    write_batch_fn: Any,
+    build_matrices_fn: Any,
+    fit_model_fn: Any,
+    calculate_bounds_fn: Any,
+    prepare_wide_fn: Any,
+    std_multiplier: float,
+    min_std_dev: float,
+    sample_residual_size: int,
+    write_series: bool = False,
+    target_field: str | None = None,
+) -> int:
+    wide_df = prepare_wide_fn(df)
+    if wide_df is None:
+        return 0
+
+    if target_field:
+        targets = [target_field]
+    else:
+        targets = [e.target for e in load_peer_rf_targets() if e.machine_id == machine_str]
+        if not targets:
+            return 0
+
+    total = 0
+    for target in targets:
+        total += _train_peer_rf_target(
+            machine_str,
+            wide_df,
+            target,
+            n_estimators,
+            max_depth,
+            timestamp_ms,
+            publish_fn=publish_fn,
+            write_batch_fn=write_batch_fn,
+            build_matrices_fn=build_matrices_fn,
+            fit_model_fn=fit_model_fn,
+            calculate_bounds_fn=calculate_bounds_fn,
+            std_multiplier=std_multiplier,
+            min_std_dev=min_std_dev,
+            sample_residual_size=sample_residual_size,
+            write_series=write_series,
+        )
+    return total
 
 
 def check_peer_rf_backfill_done(influx_bucket: str, machine: str, target_field: str, days_ago: int = 25) -> bool:
@@ -318,18 +411,22 @@ def backfill_peer_rf_historical_data() -> None:
         write_predictions_batch_to_influx,
     )
 
-    machines = load_peer_rf_machines()
-    if not machines:
-        print("[PEER-RF BACKFILL] No peer_rf_config machines — skip")
+    targets = load_peer_rf_targets()
+    if not targets:
+        print("[PEER-RF BACKFILL] No peer_rf_config targets — skip")
         return
 
-    for machine_str, cfg in machines.items():
-        if check_peer_rf_backfill_done(INFLUX_BUCKET, machine_str, cfg.target):
-            print(f"[PEER-RF BACKFILL] ⏭️  {machine_str}/{cfg.target} already has peer_rf data")
+    for entry in targets:
+        machine_str = entry.machine_id
+        target_field = entry.target
+        if check_peer_rf_backfill_done(INFLUX_BUCKET, machine_str, target_field):
+            print(f"[PEER-RF BACKFILL] ⏭️  {machine_str}/{target_field} already has peer_rf data")
             continue
 
-        print(f"\n[PEER-RF BACKFILL] Starting {machine_str} target={cfg.target} "
-              f"({ML_WINDOW_DAYS} days, {BACKFILL_CHUNK_HOURS}h chunks)")
+        print(
+            f"\n[PEER-RF BACKFILL] Starting {machine_str} target={target_field} "
+            f"({ML_WINDOW_DAYS} days, {BACKFILL_CHUNK_HOURS}h chunks)"
+        )
 
         end_date = datetime.now()
         start_date = end_date - timedelta(days=ML_WINDOW_DAYS)
@@ -338,19 +435,20 @@ def backfill_peer_rf_historical_data() -> None:
         total_chunks = int((ML_WINDOW_DAYS * 24 + BACKFILL_CHUNK_HOURS - 1) / BACKFILL_CHUNK_HOURS)
         tracker = FailedMachineTracker()
         total_written = 0
+        tracker_key = f"{machine_str}:{target_field}"
 
         while current_start < end_date:
             current_end = min(current_start + timedelta(hours=BACKFILL_CHUNK_HOURS), end_date)
             start_str = current_start.isoformat() + "Z"
             end_str = current_end.isoformat() + "Z"
-            print(f"[PEER-RF BACKFILL] Chunk {chunk_num}/{total_chunks} {start_str} → {end_str}")
+            print(f"[PEER-RF BACKFILL] {target_field} chunk {chunk_num}/{total_chunks} {start_str} → {end_str}")
 
-            if tracker.is_cooling_down(machine_str):
+            if tracker.is_cooling_down(tracker_key):
                 current_start = current_end
                 chunk_num += 1
                 continue
 
-            is_valid, _ = validate_labels(machine_str, cfg.target)
+            is_valid, _ = validate_labels(machine_str, target_field)
             if not is_valid:
                 current_start = current_end
                 chunk_num += 1
@@ -381,15 +479,16 @@ def backfill_peer_rf_historical_data() -> None:
                     min_std_dev=MIN_STD_DEV,
                     sample_residual_size=SAMPLE_RESIDUAL_SIZE,
                     write_series=True,
+                    target_field=target_field,
                 )
                 del df
                 release_memory()
                 total_written += written
                 if written > 0:
-                    print(f"[PEER-RF BACKFILL] ✓ chunk {chunk_num}: {written} points")
+                    print(f"[PEER-RF BACKFILL] ✓ {target_field} chunk {chunk_num}: {written} points")
             except Exception as e:
-                print(f"[PEER-RF BACKFILL] Error {machine_str} chunk {chunk_num}: {e}")
-                tracker.mark_failed(machine_str)
+                print(f"[PEER-RF BACKFILL] Error {machine_str}/{target_field} chunk {chunk_num}: {e}")
+                tracker.mark_failed(tracker_key)
                 ML_ERRORS.labels(error_type="peer_rf_backfill").inc()
                 release_memory()
 
@@ -397,4 +496,4 @@ def backfill_peer_rf_historical_data() -> None:
             chunk_num += 1
             time.sleep(2)
 
-        print(f"[PEER-RF BACKFILL] ✓ {machine_str} complete ({total_written} points written)")
+        print(f"[PEER-RF BACKFILL] ✓ {machine_str}/{target_field} complete ({total_written} points written)")

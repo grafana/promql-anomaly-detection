@@ -1300,7 +1300,8 @@ def main():
 
             peer_roles = merge_field_roles_from_peer_config()
             FIELD_ROLES.update(peer_roles)
-            print(f"[MAIN] Peer-RF enabled for {len(load_peer_rf_machines())} machine(s)")
+            print(f"[MAIN] Peer-RF enabled for {len(load_peer_rf_machines())} machine(s), "
+                  f"{sum(len(v) for v in load_peer_rf_machines().values())} target(s)")
         except Exception as e:
             print(f"[MAIN] Peer-RF config load failed: {e}")
     # --- Start Prometheus HTTP server ---
