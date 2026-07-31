@@ -137,6 +137,84 @@ def load_peer_rf_targets() -> list[PeerRfTargetConfig]:
         return _PEER_RF_CACHE
 
 
+def reload_peer_rf_config() -> list[PeerRfTargetConfig]:
+    """Clear cache and re-read peer_rf_config.json from disk."""
+    global _PEER_RF_CACHE
+    _PEER_RF_CACHE = None
+    return load_peer_rf_targets()
+
+
+def default_module_current_targets() -> list[dict]:
+    """Module 1–8 current: each module predicted from the other seven."""
+    fields = [f"Module{n}_Current_A" for n in range(1, 9)]
+    targets: list[dict] = []
+    for target in fields:
+        targets.append(
+            {
+                "target": target,
+                "peer_features": [f for f in fields if f != target],
+            }
+        )
+    return targets
+
+
+def read_peer_rf_config_raw() -> dict:
+    path = PEER_RF_CONFIG_PATH
+    if not os.path.isfile(path):
+        return {"machines": {}}
+    with open(path, encoding="utf-8") as f:
+        raw = json.load(f)
+    if not isinstance(raw, dict):
+        return {"machines": {}}
+    if "machines" not in raw or not isinstance(raw.get("machines"), dict):
+        raw["machines"] = {}
+    return raw
+
+
+def atomic_write_peer_rf_config(raw: dict) -> str:
+    path = PEER_RF_CONFIG_PATH
+    directory = os.path.dirname(path) or "."
+    os.makedirs(directory, exist_ok=True)
+    tmp_path = f"{path}.tmp.{os.getpid()}"
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(raw, f, indent=2)
+        f.write("\n")
+    os.replace(tmp_path, path)
+    return path
+
+
+def enroll_peer_rf_machine(
+    machine_id: str,
+    targets: list[dict] | None = None,
+) -> dict:
+    """
+    Add machine to peer_rf_config.json (modules 1–8 current by default), reload cache.
+    Does not start backfill — caller should queue that separately.
+    """
+    machine_str = str(machine_id).strip()
+    if not machine_str:
+        raise ValueError("machineId is required")
+    raw = read_peer_rf_config_raw()
+    machines = raw["machines"]
+    already = machine_str in machines
+    entry_targets = targets if targets is not None else default_module_current_targets()
+    if not entry_targets:
+        raise ValueError("targets must be a non-empty list")
+    machines[machine_str] = {"targets": entry_targets}
+    path = atomic_write_peer_rf_config(raw)
+    loaded = reload_peer_rf_config()
+    machine_targets = [e for e in loaded if e.machine_id == machine_str]
+    return {
+        "machineId": machine_str,
+        "configPath": path,
+        "alreadyEnrolled": already,
+        "targets": [
+            {"target": e.target, "peerFeatures": e.peer_features} for e in machine_targets
+        ],
+        "totalTargetsLoaded": len(loaded),
+    }
+
+
 def load_peer_rf_machines() -> dict[str, list[PeerRfTargetConfig]]:
     grouped: dict[str, list[PeerRfTargetConfig]] = {}
     for entry in load_peer_rf_targets():
@@ -497,3 +575,24 @@ def backfill_peer_rf_historical_data() -> None:
             time.sleep(2)
 
         print(f"[PEER-RF BACKFILL] ✓ {machine_str}/{target_field} complete ({total_written} points written)")
+
+
+def backfill_peer_rf_machine(machine_id: str) -> dict:
+    """Run peer-RF historical backfill for one enrolled machine only."""
+    machine_str = str(machine_id).strip()
+    full = list(load_peer_rf_targets())
+    entries = [e for e in full if e.machine_id == machine_str]
+    if not entries:
+        return {"machineId": machine_str, "ok": False, "error": "machine not enrolled", "targets": []}
+
+    global _PEER_RF_CACHE
+    try:
+        _PEER_RF_CACHE = entries
+        backfill_peer_rf_historical_data()
+        return {
+            "machineId": machine_str,
+            "ok": True,
+            "targets": [e.target for e in entries],
+        }
+    finally:
+        _PEER_RF_CACHE = full

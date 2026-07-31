@@ -1313,6 +1313,15 @@ def main():
         print(f"[MAIN] ✗ Failed to start Prometheus server: {e}")
         traceback.print_exc()
         return
+    # --- Peer-RF control API (enroll / status) on a separate port ---
+    if ENABLE_PEER_RF:
+        try:
+            from bridge_peer_rf_api import start_peer_rf_control_server
+
+            start_peer_rf_control_server()
+        except Exception as e:
+            print(f"[MAIN] ⚠️ Peer-RF control API failed to start: {e}")
+            traceback.print_exc()
     # --- Optional backfill before live loops start ---
     try:
         print(f"[MAIN] Starting backfill ({ML_WINDOW_DAYS} days, "
