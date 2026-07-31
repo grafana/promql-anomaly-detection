@@ -172,14 +172,43 @@ def read_peer_rf_config_raw() -> dict:
 
 
 def atomic_write_peer_rf_config(raw: dict) -> str:
+    """
+    Persist peer_rf_config.json safely.
+
+    Docker bind-mounts of a *single file* often reject os.replace(tmp → mounted file)
+    with errno 16 (Device or resource busy). Write via a sibling temp file + shutil.copyfile
+    into the mount, which works for both normal paths and bind mounts.
+    """
+    import shutil
+
     path = PEER_RF_CONFIG_PATH
     directory = os.path.dirname(path) or "."
     os.makedirs(directory, exist_ok=True)
-    tmp_path = f"{path}.tmp.{os.getpid()}"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        json.dump(raw, f, indent=2)
-        f.write("\n")
-    os.replace(tmp_path, path)
+    tmp_path = os.path.join(directory, f".peer_rf_config.{os.getpid()}.tmp")
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(raw, f, indent=2)
+            f.write("\n")
+            f.flush()
+            os.fsync(f.fileno())
+        try:
+            os.replace(tmp_path, path)
+        except OSError as e:
+            # Bind-mounted file: copy over the mount target in place.
+            if getattr(e, "errno", None) not in (16, 18):  # EBUSY, EXDEV
+                # Still try copy for other rename failures on mounts.
+                pass
+            shutil.copyfile(tmp_path, path)
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+    finally:
+        if os.path.isfile(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
     return path
 
 
