@@ -1,0 +1,130 @@
+# PowerTech hybrid anomaly detection
+#
+# Use BOTH:
+#   1) ML exporter (RandomForest) → machine_metrics + machine_metric_{expected,upper,lower}_bound
+#   2) promql-anomaly-detection (adaptive/robust) → metrics tagged with anomaly_name (infra, etc.)
+#
+# IMPORTANT: Do NOT add anomaly_name to machine_metrics or machine_metric_* series.
+#            Running both systems on the same signal produces conflicting bands.
+
+groups:
+  ####################################################################################
+  # Track 1 — PowerTech ML exporter (process / module / pressure metrics)
+  ####################################################################################
+
+  - name: PowerTechMLMeta
+    rules:
+      # Staleness: ML bounds should update every ~5m (ML_UPDATE_INTERVAL). Used for dashboards/alerts.
+      - record: powertech:ml_bound_age_seconds
+        expr: |-
+          time() - timestamp(machine_metric_upper_bound)
+
+      - record: powertech:ml_bounds_stale
+        expr: |-
+          (time() - timestamp(machine_metric_upper_bound)) > 600
+
+  - name: PowerTechMLAlerts
+    rules:
+      # Breach must exceed 35% of the ML band width beyond the bound, fresh bounds, sustained 25m.
+      - alert: PowerTechMLAboveUpperBound
+        expr: |-
+          (
+            (
+              machine_metrics
+              - on (machine, field) group_left()
+              last_over_time(machine_metric_upper_bound[7m])
+            )
+            / on (machine, field) group_left()
+            clamp_min(
+              last_over_time(machine_metric_upper_bound[7m])
+              - last_over_time(machine_metric_lower_bound[7m]),
+              1e-6
+            )
+            > 0.35
+          )
+          and on (machine, field)
+          (time() - timestamp(machine_metric_upper_bound) < 600)
+        for: 25m
+        labels:
+          severity: warning
+          anomaly_source: ml_exporter
+        annotations:
+          summary: "PowerTech ML: {{ $labels.machine }} / {{ $labels.field }} above upper bound"
+          description: >-
+            Actual is more than 35% of the ML band width above the upper bound for at least 25m.
+            Bounds refresh ~every 5m from the ML exporter; live actuals scrape ~15s.
+
+      - alert: PowerTechMLBelowLowerBound
+        expr: |-
+          (
+            (
+              last_over_time(machine_metric_lower_bound[7m])
+              - on (machine, field) group_left()
+              machine_metrics
+            )
+            / on (machine, field) group_left()
+            clamp_min(
+              last_over_time(machine_metric_upper_bound[7m])
+              - last_over_time(machine_metric_lower_bound[7m]),
+              1e-6
+            )
+            > 0.2
+          )
+          and on (machine, field)
+          (time() - timestamp(machine_metric_lower_bound) < 600)
+        for: 20m
+        labels:
+          severity: warning
+          anomaly_source: ml_exporter
+        annotations:
+          summary: "PowerTech ML: {{ $labels.machine }} / {{ $labels.field }} below lower bound"
+          description: >-
+            Actual is more than 20% of the ML band width below the lower bound for at least 20m.
+
+      - alert: PowerTechMLBoundsStale
+        expr: |-
+          (time() - timestamp(machine_metric_upper_bound)) > 900
+        for: 20m
+        labels:
+          severity: warning
+          anomaly_source: ml_exporter
+        annotations:
+          summary: "PowerTech ML bounds stale for {{ $labels.machine }} / {{ $labels.field }}"
+          description: >-
+            No fresh machine_metric_upper_bound for 15m+. Check ML exporter (:8000),
+            training loop errors, or Prometheus scrape.
+
+  ####################################################################################
+  # Track 2 — Infra / host metrics (promql-anomaly-detection adaptive/robust)
+  #
+  # Copy patterns from node_exporter.yml. Tag with anomaly_name — NOT machine_metrics.
+  ####################################################################################
+
+  - name: PowerTechInfraAdaptiveExample
+    rules:
+      - record: anomaly:resource:cpu
+        expr: |-
+          (((count by (instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job)))
+          -
+          avg by (instance, job) (sum by (instance, mode, job)(irate(node_cpu_seconds_total{mode='idle',job=~"node_exporter"}[5m])))) * 100)
+          /
+          count by(instance, job) (count(node_cpu_seconds_total{job=~"node_exporter"}) by (cpu, instance, job))
+        labels:
+          anomaly_name: "node_cpu"
+          anomaly_type: "resource"
+          anomaly_strategy: "adaptive"
+
+      - record: anomaly:resource:memory
+        expr: |-
+          100 -
+          (
+            avg by (instance, job) (node_memory_MemAvailable_bytes{job=~"node_exporter"}) /
+            avg by (instance, job) (node_memory_MemTotal_bytes{job=~"node_exporter"})
+          * 100
+          )
+        labels:
+          anomaly_name: "node_memory"
+          anomaly_type: "resource"
+          anomaly_strategy: "adaptive"
+
+  # Track 2 alerts come from rules/adaptive.yml and rules/robust.yml (AnomalyDetected).

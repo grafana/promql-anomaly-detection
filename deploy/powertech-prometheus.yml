@@ -1,0 +1,20 @@
+# Snippet for PowerTech Docker Prometheus (~/ptw_data/Cloud/Docker/prometheus/prometheus.yml)
+# Merge rule_files and reload: POST http://localhost:9090/-/reload
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "/etc/prometheus/machine*.yml"
+  - "/etc/prometheus/rules/*.yml"
+  - "/etc/prometheus/rules/examples/*.yml"
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: influxdb-bridge
+    static_configs:
+      - targets: ["data-bridge:8000"]

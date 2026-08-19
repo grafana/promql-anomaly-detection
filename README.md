@@ -33,6 +33,10 @@ You can simulate anomalies by altering the traffic patterns in the load generato
 > [!IMPORTANT]
 > Most strategies require 24-26 hours of data to be fully trained. Until enough data is processed, anomaly bands may be more sensitive than otherwise expected.
 
+## PowerTech hybrid (ML exporter + this framework)
+
+If you run a **RandomForest ML exporter** for plant/process metrics (`machine_metrics`, `machine_metric_upper_bound`, etc.) **and** want promql-anomaly-detection for host/infra series, use the [hybrid guide](docs/hybrid-powertech.md), the Python exporter in [`exporter/bridge.py`](exporter/bridge.py), and [`rules/examples/powertech_hybrid.yml`](rules/examples/powertech_hybrid.yml). Do not tag ML exporter metrics with `anomaly_name`.
+
 ## Usage
 
 In order to use the framework, you will need to copy the rules folder to a folder accessible by your Prometheus instance, and update

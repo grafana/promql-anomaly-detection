@@ -23,3 +23,12 @@ should include both `anomaly_strategy` and `anomaly_select`.
 ## Examples
 
 The examples folder shows how recording rules can be used to "tag" metrics to be processed by the anomaly detection framework.
+
+### PowerTech hybrid (ML exporter + this framework)
+
+For deployments that use a **custom ML exporter** (`machine_metrics`, `machine_metric_*_bound`) **and** promql-anomaly-detection for infra metrics, see:
+
+- [`examples/powertech_hybrid.yml`](examples/powertech_hybrid.yml) — ML bound alerts + example infra tagging
+- [`docs/hybrid-powertech.md`](../docs/hybrid-powertech.md) — architecture and Grafana panel recipes
+
+Do not apply `anomaly_name` labels to ML exporter metrics; use each track only for its intended signals.
