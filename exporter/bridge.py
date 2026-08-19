@@ -18,6 +18,26 @@ import traceback
 import resource
 import ctypes
 
+try:
+    from field_fill import merge_partial_field_rows
+except ImportError:
+    def merge_partial_field_rows(wide_df, *, use_bfill=False, stale_seconds=0):
+        if wide_df.empty:
+            return wide_df
+        wide_df = wide_df.sort_index()
+        observed = wide_df.notna()
+        filled = wide_df.ffill()
+        if use_bfill:
+            filled = filled.bfill()
+        if stale_seconds and stale_seconds > 0:
+            idx = pd.to_datetime(wide_df.index, utc=True, errors="coerce")
+            max_age = pd.Timedelta(seconds=stale_seconds)
+            times = pd.Series(idx, index=wide_df.index)
+            for col in wide_df.columns:
+                last_obs = times.where(observed[col]).ffill()
+                filled[col] = filled[col].where((times - last_obs).le(max_age))
+        return filled.dropna()
+
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -72,6 +92,14 @@ MAX_FIELD_LENGTH        = 30
 MAX_METRICS_PER_MACHINE = 255
 LABEL_TIMEOUT           = 600
 MAX_ROWS_PER_MACHINE    = 10_000
+# MQTT may send only changed fields. Merge last values in Docker before ML.
+# FILL_USE_BFILL=1 also copies future values backward (historical chunks only).
+FILL_USE_BFILL = os.environ.get("FILL_USE_BFILL", "0").strip().lower() in ("1", "true", "yes")
+# Drop a carried-forward value if its last real MQTT sample is older than this (0 = off).
+try:
+    FILL_STALE_SECONDS = int(os.environ.get("FILL_STALE_SECONDS", "0"))
+except ValueError:
+    FILL_STALE_SECONDS = 0
 # --- Memory Thresholds (MB) ---
 MEMORY_CRITICAL_MB = 5000
 MEMORY_WARNING_MB  = 3000
@@ -608,7 +636,11 @@ def prepare_wide_df(df: pd.DataFrame) -> pd.DataFrame | None:
             values=VALUE_COLUMN,
             aggfunc='first',
         )
-        wide_df = wide_df.ffill().bfill().dropna()
+        wide_df = merge_partial_field_rows(
+            wide_df,
+            use_bfill=FILL_USE_BFILL,
+            stale_seconds=FILL_STALE_SECONDS,
+        )
         if not has_sufficient_data(wide_df):
             return None
         wide_df.index = pd.to_datetime(wide_df.index, format='ISO8601')  # ← FIXED

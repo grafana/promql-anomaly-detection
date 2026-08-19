@@ -14,6 +14,7 @@ RSYNC_FILES=(
   "${REPO_ROOT}/exporter/bridge.py"
   "${REPO_ROOT}/exporter/bridge_peer_rf.py"
   "${REPO_ROOT}/exporter/bridge_peer_rf_api.py"
+  "${REPO_ROOT}/exporter/field_fill.py"
   "${REPO_ROOT}/exporter/delete_ml_predictions.sh"
   "${REPO_ROOT}/exporter/delete_peer_rf_predictions.sh"
 )
