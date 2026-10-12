@@ -55,12 +55,12 @@ Multiple anomaly detection strategies are supported. You can optionally select t
   - `adaptive` (default): Based on the mean and standard deviation, with a smoothing function over 26h and a high pass filter to improve sensitivity. Ideal for quick detection of short term changes, while minimizing false positives for recurring events. Works best with normally distributed metrics.
   - `robust`: Based on the median and MAD (median absolute deviation). This algorithm is robust to outliers. Use it when you want to detect long term changes and for spiky or non-normally distributed metrics.
 
-Optionally, the `anomaly_type` label can be used to define more granular per-type thresholds:
+Optionally, the `anomaly_type` label can be used to adjust the detection per metric type:
 
-- `anomaly_type`: It allows defining different thresholds and multipliers per metric type. The following types are supported by default:
-  - `requests`: The request rate for a given service.
-  - `latency`: The latency for a given service (for example, the 95th percentile).
-  - `errors`: The error rate for a given service.
+- `anomaly_type`: The following types are supported:
+  - `requests`: Request rate. Sparse metrics (under 5 requests per minute on average) are excluded.
+  - `latency`: Latency (for example, the 95th percentile). Only increases are considered anomalous.
+  - `errors`: Error rate. Only increases are considered anomalous.
   - `resource`: A gauge representing a resource (for example, cpu or memory usage).
 
 The `rules/examples` folder shows how recording rules can be used for selecting metrics to be used for anomaly detection.
