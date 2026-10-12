@@ -35,24 +35,21 @@ groups:
       # The framework will take as input any metric tagged with the labels "anomaly_name" and "anomaly_type".
       # - "anomaly_name" uniquely identifies the metric within the anomaly detection framework.
       # - "anomaly_type" can be used to define independent thresholds for each metric type.
-      # A filter is used to exclude metrics that are highly sparse.
-      - record: anomaly:adaptive:select
+      #
+      # anomaly:level is the value the alerting rules compare against the bands. It carries the raw input,
+      # which is expected to be finite and non-negative.
+      - record: anomaly:level
         expr: |-
-          (
-            {anomaly_name!="", anomaly_type="requests", anomaly_select="", anomaly_strategy=~"^$|adaptive"} > 0
-            unless avg_over_time({anomaly_name!="", anomaly_type="requests", anomaly_select="", anomaly_strategy=~"^$|adaptive"}[1h]) < on() group_left anomaly:adaptive:sparse_threshold
-          )
-          OR
-          {anomaly_name!="", anomaly_type="latency", anomaly_select="", anomaly_strategy=~"^$|adaptive"} > 0
-          OR
-          {anomaly_name!="", anomaly_type="errors", anomaly_select="", anomaly_strategy=~"^$|adaptive"} > 0
-          OR
-          {anomaly_name!="", anomaly_type="resource", anomaly_select="", anomaly_strategy=~"^$|adaptive"} > 0
-          OR
-          {anomaly_name!="", anomaly_select="", anomaly_strategy=~"^$|adaptive"} > 0
+          {anomaly_name!="", anomaly_select="", anomaly_strategy=~"^$|adaptive"}
         labels:
           anomaly_select: "1"
           anomaly_strategy: adaptive
+
+      # Highly sparse request metrics are excluded.
+      - record: anomaly:adaptive:select
+        expr: |-
+          anomaly:level{anomaly_strategy="adaptive"} > 0
+          unless avg_over_time(anomaly:level{anomaly_strategy="adaptive", anomaly_type="requests"}[1h]) < on() group_left anomaly:adaptive:sparse_threshold
 
       # The mid-line used used as the reference to calculate upper and lower bands.
       # 1 hour is a good compromise between smoothness and responsiveness.
@@ -76,37 +73,9 @@ groups:
         expr: |-
           avg_over_time(anomaly:adaptive:stddev_1h:filtered[26h])
 
-      # The metric used to compare against the baselines to detect anomalies.
-      - record: anomaly:level
-        expr: |-
-          anomaly:adaptive:select
-
       # Short term, margin and long term bands are combined to form the final bands used for anomaly detection.
       # Margin bands provide minimum width bands and are purely based on the avg_1h. They act as a fallback band for periods in which
       # short term bands do not exist due to very low variability.
-      - record: anomaly:lower_band
-        expr: |-
-          clamp_min(
-            min without(prediction_type)
-            (
-                label_replace(
-                    last_over_time(anomaly:adaptive:avg_1h[2m]) - last_over_time(anomaly:adaptive:stddev_st[2m]) * on() group_left anomaly:adaptive:stddev_multiplier,
-                    "prediction_type", "short_term", "", ""
-                )
-                or
-                label_replace(
-                    last_over_time(anomaly:adaptive:avg_1h[2m]) - last_over_time(anomaly:adaptive:avg_1h[2m]) * on() group_left anomaly:adaptive:margin_multiplier,
-                    "prediction_type", "margin", "", ""
-                )
-                or
-                label_replace(
-                    last_over_time(anomaly:adaptive:lower_band_lt[10m]),
-                    "prediction_type", "long_term", "", ""
-                )
-            ),
-            0
-          )
-
       - record: anomaly:upper_band
         expr: |-
           max without(prediction_type)
@@ -126,6 +95,32 @@ groups:
                 "prediction_type", "long_term", "", ""
             )
           )
+
+      - record: anomaly:lower_band
+        expr: |-
+          clamp_min(
+            min without(prediction_type)
+            (
+                label_replace(
+                    last_over_time(anomaly:adaptive:avg_1h{anomaly_type!~"errors|latency"}[2m]) - last_over_time(anomaly:adaptive:stddev_st[2m]) * on() group_left anomaly:adaptive:stddev_multiplier,
+                    "prediction_type", "short_term", "", ""
+                )
+                or
+                label_replace(
+                    last_over_time(anomaly:adaptive:avg_1h{anomaly_type!~"errors|latency"}[2m]) - last_over_time(anomaly:adaptive:avg_1h[2m]) * on() group_left anomaly:adaptive:margin_multiplier,
+                    "prediction_type", "margin", "", ""
+                )
+                or
+                label_replace(
+                    last_over_time(anomaly:adaptive:lower_band_lt{anomaly_type!~"errors|latency"}[10m]),
+                    "prediction_type", "long_term", "", ""
+                )
+            ),
+            0
+          )
+          # Errors and latency are anomalous on increases only: their lower band is pinned to zero wherever an upper band exists.
+          or
+          anomaly:upper_band{anomaly_strategy="adaptive", anomaly_type=~"errors|latency"} * 0
 
   # Long term bands are calculated by a different recording rule group with higher interval for efficiency reasons.
   # They are based on the same principles as short term bands, but with a lookback offset. They can be easily be extended to
