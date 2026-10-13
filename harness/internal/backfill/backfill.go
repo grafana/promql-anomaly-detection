@@ -2,6 +2,8 @@ package backfill
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -53,11 +55,16 @@ func RunWithDB(ctx context.Context, opts Options, dbFn func(*tsdb.DB, *promql.En
 		return fmt.Errorf("copying fixture blocks: %w", err)
 	}
 
+	maxBlockTime, err := maxBlockTime(opts.WorkDir)
+	if err != nil {
+		return fmt.Errorf("reading fixture block metadata: %w", err)
+	}
+
 	tsdbOpts := tsdb.DefaultOptions()
-	// Allow appending samples within the fixture's time range, which is already
-	// covered by the sealed blocks we copied. Without this the TSDB head rejects
-	// any sample older than the latest block's max time with "out of bounds".
-	tsdbOpts.OutOfOrderTimeWindow = opts.End.Sub(opts.Start).Milliseconds() + int64(time.Hour/time.Millisecond)
+	// The head accepts samples back to its max time minus this window. The head's
+	// max time starts at the newest block's max time, so the window has to reach
+	// from there back to the start of the backfill range.
+	tsdbOpts.OutOfOrderTimeWindow = max(maxBlockTime, opts.End.UnixMilli()) - opts.Start.UnixMilli() + time.Hour.Milliseconds()
 
 	db, err := tsdb.Open(opts.WorkDir, logger, prometheus_client.NewRegistry(), tsdbOpts, nil)
 	if err != nil {
@@ -194,6 +201,33 @@ func withRuleLabels(lbls labels.Labels, name string, extra map[string]string) la
 		b.Set(k, v)
 	}
 	return b.Labels()
+}
+
+// maxBlockTime returns the largest maxTime across the block directories in dir.
+func maxBlockTime(dir string) (int64, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return 0, err
+	}
+	var maxTime int64
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		data, err := os.ReadFile(filepath.Join(dir, e.Name(), "meta.json"))
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		if err != nil {
+			return 0, err
+		}
+		var meta tsdb.BlockMeta
+		if err := json.Unmarshal(data, &meta); err != nil {
+			return 0, fmt.Errorf("parsing %s: %w", e.Name(), err)
+		}
+		maxTime = max(maxTime, meta.MaxTime)
+	}
+	return maxTime, nil
 }
 
 // copyBlocks copies TSDB block directories from src into dst.
