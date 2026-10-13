@@ -18,7 +18,7 @@ This is exactly what Prometheus does at runtime — the harness just does it off
 
 ## Prerequisites
 
-- Go 1.22+
+- Go 1.26+
 
 ## Quick start
 
@@ -33,7 +33,6 @@ make test    # run acceptance tests
 1. Edit the rule under `rules/`.
 2. Run `make test` to run acceptance tests against the committed fixtures.
 3. If a test fails because the change is intentional, update the test case.
-4. Optionally load the fixture into the demo to inspect results visually (see below).
 
 ## Fixtures
 
@@ -41,7 +40,7 @@ Fixtures are small TSDB block snapshots that serve as reproducible inputs for te
 
 ### Capturing a new fixture
 
-Export the source metric from any Prometheus instance (the demo or a production one) with timestamps remapped to a stable historic date so the fixture never overlaps with a live instance:
+Export the source metric from any Prometheus instance (the demo or a production one) with timestamps remapped to a stable historic date, so tests can reference fixed timestamps:
 
 ```bash
 cd demo && make start
@@ -57,22 +56,6 @@ make fixture-export \
 ```
 
 Commit the resulting blocks. The `START`/`END` used for backfill and tests should match the remapped range (starting at `REMAP_START`).
-
-### Loading a fixture into the demo
-
-To visually inspect rule output in Grafana before committing:
-
-```bash
-cd demo && make start
-
-cd ../harness
-make fixture-load \
-  FIXTURE='fixtures/smoke' \
-  START='2025-01-01T00:00:00Z' \
-  END='2025-01-01T00:30:00Z'
-```
-
-Restart Prometheus to pick up the injected blocks, then open Grafana and set the time range to match the fixture window.
 
 ## Acceptance tests
 

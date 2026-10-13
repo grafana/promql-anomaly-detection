@@ -33,14 +33,10 @@ type Options struct {
 	// Start and End define the backfill time range.
 	Start time.Time
 	End   time.Time
-	// SnapshotDir, if set, receives a copy of all sealed blocks (including the compacted
-	// OOO head) after evaluation. Use this to inject results into a Prometheus data
-	// directory. Restart Prometheus afterwards to pick up the new blocks.
-	SnapshotDir string
 }
 
-// Run copies the fixture blocks into WorkDir, evaluates all recording rule waves
-// in-process, and optionally snapshots the result into SnapshotDir.
+// Run copies the fixture blocks into WorkDir and evaluates all recording rule
+// waves in-process.
 func Run(ctx context.Context, opts Options) error {
 	return RunWithDB(ctx, opts, nil)
 }
@@ -100,40 +96,8 @@ func RunWithDB(ctx context.Context, opts Options, dbFn func(*tsdb.DB, *promql.En
 	}
 
 	if dbFn != nil {
-		if err := dbFn(db, engine); err != nil {
-			return err
-		}
+		return dbFn(db, engine)
 	}
-
-	if opts.SnapshotDir != "" {
-		// Backfill samples land in the OOO buffer (they overlap the fixture blocks).
-		// Compact the OOO head into sealed blocks before copying.
-		level.Info(logger).Log("msg", "compacting OOO head")
-		if err := db.CompactOOOHead(ctx); err != nil {
-			return fmt.Errorf("compacting OOO head: %w", err)
-		}
-
-		level.Info(logger).Log("msg", "copying blocks", "dir", opts.SnapshotDir)
-		if err := os.MkdirAll(opts.SnapshotDir, 0o777); err != nil {
-			return fmt.Errorf("creating snapshot dir: %w", err)
-		}
-
-		for _, b := range db.Blocks() {
-			dst := filepath.Join(opts.SnapshotDir, b.Meta().ULID.String())
-			// Remove any stale block from a previous load with the same ULID.
-			if err := os.RemoveAll(dst); err != nil {
-				return fmt.Errorf("removing stale block %s: %w", b.Meta().ULID, err)
-			}
-			// Copy with 0777/0666 permissions so Prometheus (running as a
-			// different user) can compact and delete the block later.
-			if err := copyDirWritable(b.Dir(), dst); err != nil {
-				return fmt.Errorf("copying block %s: %w", b.Meta().ULID, err)
-			}
-			level.Info(logger).Log("msg", "copied block", "ulid", b.Meta().ULID)
-		}
-		level.Info(logger).Log("msg", "copy complete", "dir", opts.SnapshotDir)
-	}
-
 	return nil
 }
 
@@ -269,30 +233,6 @@ func copyDir(src, dst string) error {
 			return os.MkdirAll(target, info.Mode())
 		}
 		return copyFile(path, target, info.Mode())
-	})
-}
-
-// copyDirWritable copies src into dst with world-readable/writable permissions
-// so that a different user (e.g. Prometheus running as nobody) can manage the files.
-func copyDirWritable(src, dst string) error {
-	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		rel, err := filepath.Rel(src, path)
-		if err != nil {
-			return err
-		}
-		target := filepath.Join(dst, rel)
-		if info.IsDir() {
-			if err := os.MkdirAll(target, 0o777); err != nil {
-				return err
-			}
-			// MkdirAll respects the process umask; chmod explicitly so the
-			// directory is writable by Prometheus (running as a different user).
-			return os.Chmod(target, 0o777)
-		}
-		return copyFile(path, target, 0o666)
 	})
 }
 

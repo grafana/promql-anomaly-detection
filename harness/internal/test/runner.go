@@ -32,10 +32,10 @@ type Suite struct {
 
 // Case is a single test assertion.
 type Case struct {
-	Description string    `yaml:"description"`
-	Query       string    `yaml:"query"`
-	At          string    `yaml:"at"`
-	Expect      []Expect  `yaml:"expect"`
+	Description string   `yaml:"description"`
+	Query       string   `yaml:"query"`
+	At          string   `yaml:"at"`
+	Expect      []Expect `yaml:"expect"`
 }
 
 // Expect describes what a single series in the query result should look like.

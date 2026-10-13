@@ -23,14 +23,3 @@ fixture-export: build
 		--end   '$(END)' \
 		--out   '$(OUT)' \
 		$(if $(REMAP_START),--remap-start '$(REMAP_START)')
-
-# fixture-load: backfill a fixture into the running demo Prometheus.
-# Usage: make fixture-load FIXTURE='fixtures/my-fixture' START='...' END='...'
-.PHONY: fixture-load
-fixture-load: build
-	./$(BIN) fixture load \
-		--fixture '$(FIXTURE)' \
-		--rules   ../rules/adaptive.yml \
-		--rules   ../rules/robust.yml \
-		--start   '$(START)' \
-		--end     '$(END)'

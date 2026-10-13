@@ -1,2 +1,0 @@
-# Prometheus data directory (bind-mounted from demo, contains live TSDB data)
-demo/prometheus-data/

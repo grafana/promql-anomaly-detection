@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -38,8 +37,8 @@ type depsRuleOutput struct {
 }
 
 type depsWaveOutput struct {
-	Wave  int                `yaml:"wave"`
-	Rules []depsRuleOutput   `yaml:"rules"`
+	Wave  int              `yaml:"wave"`
+	Rules []depsRuleOutput `yaml:"rules"`
 }
 
 func depsCmd() *cobra.Command {
@@ -102,16 +101,15 @@ func fixtureCmd() *cobra.Command {
 		Short: "Manage test fixtures",
 	}
 	cmd.AddCommand(fixtureExportCmd())
-	cmd.AddCommand(fixtureLoadCmd())
 	return cmd
 }
 
 func testCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "test <test-file> [test-file...]",
-		Short: "Run acceptance tests against a fixture",
+		Use:     "test <test-file> [test-file...]",
+		Short:   "Run acceptance tests against a fixture",
 		Example: `  harness test tests/adaptive.yml`,
-		Args:  cobra.MinimumNArgs(1),
+		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			passed, failed := 0, 0
 			for _, path := range args {
@@ -136,66 +134,6 @@ func testCmd() *cobra.Command {
 			return nil
 		},
 	}
-}
-
-func fixtureLoadCmd() *cobra.Command {
-	var (
-		fixtureDir     string
-		ruleFiles      []string
-		start          string
-		end            string
-		prometheusData string
-	)
-
-	cmd := &cobra.Command{
-		Use:   "load",
-		Short: "Backfill a fixture and inject the results into the demo Prometheus",
-		Example: `  harness fixture load \
-    --fixture  fixtures/smoke \
-    --rules    rules/adaptive.yml \
-    --start    2025-01-01T00:00:00Z \
-    --end      2025-01-01T00:30:00Z \
-    --prom-data demo/prometheus-data`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			startT, err := time.Parse(time.RFC3339, start)
-			if err != nil {
-				return fmt.Errorf("invalid --start: %w", err)
-			}
-			endT, err := time.Parse(time.RFC3339, end)
-			if err != nil {
-				return fmt.Errorf("invalid --end: %w", err)
-			}
-			// Create the work dir on the same filesystem as prometheusData so that
-			// copyDirWritable can write blocks directly without crossing a device boundary.
-			workDir, err := os.MkdirTemp(filepath.Dir(prometheusData), "harness-backfill-*")
-			if err != nil {
-				return fmt.Errorf("creating work dir: %w", err)
-			}
-			defer os.RemoveAll(workDir)
-
-			return backfill.Run(cmd.Context(), backfill.Options{
-				FixtureDir:  fixtureDir,
-				WorkDir:     workDir,
-				RuleFiles:   ruleFiles,
-				Start:       startT,
-				End:         endT,
-				SnapshotDir: prometheusData,
-			})
-		},
-	}
-
-	cmd.Flags().StringVar(&fixtureDir, "fixture", "", "Source fixture directory")
-	cmd.Flags().StringArrayVar(&ruleFiles, "rules", nil, "Rule file(s) to evaluate (repeatable)")
-	cmd.Flags().StringVar(&start, "start", "", "Start time in RFC3339 format")
-	cmd.Flags().StringVar(&end, "end", "", "End time in RFC3339 format")
-	cmd.Flags().StringVar(&prometheusData, "prom-data", "../demo/prometheus-data", "Prometheus data directory to inject blocks into")
-
-	cmd.MarkFlagRequired("fixture")
-	cmd.MarkFlagRequired("rules")
-	cmd.MarkFlagRequired("start")
-	cmd.MarkFlagRequired("end")
-
-	return cmd
 }
 
 func backfillCmd() *cobra.Command {
