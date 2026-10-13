@@ -12,7 +12,7 @@ In addition, a selection mechanism is required to ensure only metrics tagged wit
 ```yaml
 - record: anomaly:<my_strategy>:select
     expr: |-
-        {anomaly_name!="", anomaly_select="", anomaly_strategy="<my_strategy>"}
+        {anomaly_name!="", anomaly_select="", anomaly_strategy="<my_strategy>"} > 0
     labels:
         anomaly_select: "1"
 ```

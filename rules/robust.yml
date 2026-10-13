@@ -23,21 +23,12 @@ groups:
     #                     Base Rules                                               #
     ################################################################################
 
+    # Highly sparse request metrics are excluded.
     - record: anomaly:robust:select
       expr: |-
-        (
-          {anomaly_name!="", anomaly_type="requests", anomaly_select="", anomaly_strategy="robust"} > 0
-          unless avg_over_time({anomaly_name!="", anomaly_type="requests", anomaly_select="", anomaly_strategy="robust"}[1h])
-                 < on() group_left anomaly:robust:sparse_threshold
-        )
-        OR
-        {anomaly_name!="", anomaly_type="latency", anomaly_select="", anomaly_strategy="robust"} > 0
-        OR
-        {anomaly_name!="", anomaly_type="errors", anomaly_select="", anomaly_strategy="robust"} > 0
-        OR
-        {anomaly_name!="", anomaly_type="resource", anomaly_select="", anomaly_strategy="robust"} > 0
-        OR
         {anomaly_name!="", anomaly_select="", anomaly_strategy="robust"} > 0
+        unless avg_over_time({anomaly_name!="", anomaly_type="requests", anomaly_select="", anomaly_strategy="robust"}[1h])
+               < on() group_left anomaly:robust:sparse_threshold
       labels:
         anomaly_select: "1"
 
@@ -64,29 +55,6 @@ groups:
     - record: anomaly:level
       expr: quantile_over_time(0.5, anomaly:robust:select[1h])
 
-    # Final Lower Band
-    - record: anomaly:lower_band
-      expr: |-
-        clamp_min(
-          min without(prediction_type) (
-            label_replace(
-              last_over_time(anomaly:robust:median_lt[2m]) - last_over_time(anomaly:robust:mad_lt[2m]) * on() group_left anomaly:robust:mad_multiplier,
-              "prediction_type", "short_term", "", ""
-            )
-            or
-            label_replace(
-              last_over_time(anomaly:robust:median_lt[2m]) - last_over_time(anomaly:robust:lower_band_margin[2m]),
-              "prediction_type", "margin", "", ""
-            )
-            or
-            label_replace(
-              last_over_time(anomaly:robust:lower_seasonality_band[10m]),
-              "prediction_type", "seasonality", "", ""
-            )
-          ),
-          0
-        )
-
     # Final Upper Band
     - record: anomaly:upper_band
       expr: |-
@@ -106,6 +74,32 @@ groups:
             "prediction_type", "seasonality", "", ""
           )
         )
+
+    # Final Lower Band
+    - record: anomaly:lower_band
+      expr: |-
+        clamp_min(
+          min without(prediction_type) (
+            label_replace(
+              last_over_time(anomaly:robust:median_lt{anomaly_type!~"errors|latency"}[2m]) - last_over_time(anomaly:robust:mad_lt[2m]) * on() group_left anomaly:robust:mad_multiplier,
+              "prediction_type", "short_term", "", ""
+            )
+            or
+            label_replace(
+              last_over_time(anomaly:robust:median_lt{anomaly_type!~"errors|latency"}[2m]) - last_over_time(anomaly:robust:lower_band_margin[2m]),
+              "prediction_type", "margin", "", ""
+            )
+            or
+            label_replace(
+              last_over_time(anomaly:robust:lower_seasonality_band{anomaly_type!~"errors|latency"}[10m]),
+              "prediction_type", "seasonality", "", ""
+            )
+          ),
+          0
+        )
+        # Errors and latency are anomalous on increases only: their lower band is pinned to zero wherever an upper band exists.
+        or
+        anomaly:upper_band{anomaly_strategy="robust", anomaly_type=~"errors|latency"} * 0
 
 - name: AnomalyRobustSeasonal
   interval: 5m
