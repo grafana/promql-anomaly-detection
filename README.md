@@ -86,3 +86,19 @@ Margin bands provide a minimum band width when variability is too low.
 ### Alerting Rules
 
 Alerting rules are used to detect when a time series crosses the anomaly bands for a significant period of time.
+
+## Limitations
+
+Zero values are treated as missing data points: the bands model what a metric looks like while it is active, and a metric dropping to zero does not trigger `AnomalyDetected`. Drops to zero are best detected with a separate alert, for example:
+
+```yaml
+- alert: TrafficStopped
+  expr: |-
+    my_metric == 0
+    and min_over_time(my_metric[1h] offset 23h30m) > 0
+  for: 15m
+```
+
+This rule fires if the metric drops to 0 and it wasn't 0 at the same time the day before.
+
+Inputs are expected to be finite and non-negative.
