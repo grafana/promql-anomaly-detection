@@ -51,12 +51,9 @@ groups:
     - record: anomaly:robust:upper_band_margin
       expr: anomaly:robust:median_lt * on() group_left anomaly:robust:margin_multiplier
 
-    # The metric used to compare against the baselines to detect anomalies. It is computed over the raw input,
-    # which is expected to be finite and non-negative.
+    # The metric used to compare against the baselines to detect anomalies.
     - record: anomaly:level
-      expr: quantile_over_time(0.5, {anomaly_name!="", anomaly_select="", anomaly_strategy="robust"}[1h])
-      labels:
-        anomaly_select: "1"
+      expr: quantile_over_time(0.5, anomaly:robust:select[1h])
 
     # Final Upper Band
     - record: anomaly:upper_band

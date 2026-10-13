@@ -35,21 +35,14 @@ groups:
       # The framework will take as input any metric tagged with the labels "anomaly_name" and "anomaly_type".
       # - "anomaly_name" uniquely identifies the metric within the anomaly detection framework.
       # - "anomaly_type" can be used to define independent thresholds for each metric type.
-      #
-      # anomaly:level is the value the alerting rules compare against the bands. It carries the raw input,
-      # which is expected to be finite and non-negative.
-      - record: anomaly:level
+      # A filter is used to exclude request metrics that are highly sparse.
+      - record: anomaly:adaptive:select
         expr: |-
-          {anomaly_name!="", anomaly_select="", anomaly_strategy=~"^$|adaptive"}
+          {anomaly_name!="", anomaly_select="", anomaly_strategy=~"^$|adaptive"} > 0
+          unless avg_over_time({anomaly_name!="", anomaly_type="requests", anomaly_select="", anomaly_strategy=~"^$|adaptive"}[1h]) < on() group_left anomaly:adaptive:sparse_threshold
         labels:
           anomaly_select: "1"
           anomaly_strategy: adaptive
-
-      # Highly sparse request metrics are excluded.
-      - record: anomaly:adaptive:select
-        expr: |-
-          anomaly:level{anomaly_strategy="adaptive"} > 0
-          unless avg_over_time(anomaly:level{anomaly_strategy="adaptive", anomaly_type="requests"}[1h]) < on() group_left anomaly:adaptive:sparse_threshold
 
       # The mid-line used used as the reference to calculate upper and lower bands.
       # 1 hour is a good compromise between smoothness and responsiveness.
@@ -72,6 +65,11 @@ groups:
       - record: anomaly:adaptive:stddev_st
         expr: |-
           avg_over_time(anomaly:adaptive:stddev_1h:filtered[26h])
+
+      # The metric used to compare against the baselines to detect anomalies.
+      - record: anomaly:level
+        expr: |-
+          anomaly:adaptive:select
 
       # Short term, margin and long term bands are combined to form the final bands used for anomaly detection.
       # Margin bands provide minimum width bands and are purely based on the avg_1h. They act as a fallback band for periods in which
