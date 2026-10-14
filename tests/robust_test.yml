@@ -1,0 +1,35 @@
+rule_files:
+  - ../rules/robust.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'requests{anomaly_name="steady", anomaly_type="requests", anomaly_strategy="robust", job="a"}'
+        values: '100+0x1799'
+
+    promql_expr_test:
+      - expr: anomaly:robust:select{anomaly_name="steady"}
+        eval_time: 28h
+        exp_samples:
+          - labels: 'anomaly:robust:select{anomaly_name="steady", anomaly_select="1", anomaly_strategy="robust", anomaly_type="requests", job="a"}'
+            value: 100
+
+      - expr: anomaly:level{anomaly_name="steady"}
+        eval_time: 28h
+        exp_samples:
+          - labels: 'anomaly:level{anomaly_name="steady", anomaly_select="1", anomaly_strategy="robust", anomaly_type="requests", job="a"}'
+            value: 100
+
+      - expr: anomaly:upper_band{anomaly_name="steady"}
+        eval_time: 28h
+        exp_samples:
+          - labels: 'anomaly:upper_band{anomaly_name="steady", anomaly_select="1", anomaly_strategy="robust", anomaly_type="requests", job="a"}'
+            value: 150
+
+      - expr: anomaly:lower_band{anomaly_name="steady"}
+        eval_time: 28h
+        exp_samples:
+          - labels: 'anomaly:lower_band{anomaly_name="steady", anomaly_select="1", anomaly_strategy="robust", anomaly_type="requests", job="a"}'
+            value: 50
