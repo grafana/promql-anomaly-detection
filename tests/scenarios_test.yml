@@ -1,0 +1,258 @@
+# Scenario tests: three days of synthetic input at 1m resolution starting at time zero,
+# every series tagged for both strategies. Day 1 trains the bands, day 2 holds the
+# anomalies and day 3 holds the drop-to-zero and business-hours checks. A value written
+# as `v+0xN` is N+1 samples of v.
+rule_files:
+  - ../rules/adaptive.yml
+  - ../rules/robust.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      # steady: 100 req/s, x3 for 45m on day 2 at 10:00
+      - series: 'requests{anomaly_name="steady",anomaly_type="requests",anomaly_strategy="adaptive",job="synthetic"}'
+        values: '100+0x2039 300+0x44 100+0x2234'
+      - series: 'requests{anomaly_name="steady",anomaly_type="requests",anomaly_strategy="robust",job="synthetic"}'
+        values: '100+0x2039 300+0x44 100+0x2234'
+      # sparse: 3 req/min, under the 5 req/min threshold
+      - series: 'requests{anomaly_name="sparse",anomaly_type="requests",anomaly_strategy="adaptive",job="synthetic"}'
+        values: '0.05+0x4319'
+      - series: 'requests{anomaly_name="sparse",anomaly_type="requests",anomaly_strategy="robust",job="synthetic"}'
+        values: '0.05+0x4319'
+      # errors: 2 err/s, x5 for 45m on day 2 at 14:00, zero on day 3 from 06:00 to 08:00
+      - series: 'requests{anomaly_name="errors",anomaly_type="errors",anomaly_strategy="adaptive",job="synthetic"}'
+        values: '2+0x2279 10+0x44 2+0x914 0+0x119 2+0x959'
+      - series: 'requests{anomaly_name="errors",anomaly_type="errors",anomaly_strategy="robust",job="synthetic"}'
+        values: '2+0x2279 10+0x44 2+0x914 0+0x119 2+0x959'
+      # latency: flat 200ms
+      - series: 'requests{anomaly_name="latency",anomaly_type="latency",anomaly_strategy="adaptive",job="synthetic"}'
+        values: '200+0x4319'
+      - series: 'requests{anomaly_name="latency",anomaly_type="latency",anomaly_strategy="robust",job="synthetic"}'
+        values: '200+0x4319'
+      # dropzero: 100 req/s, zero on day 3 from 02:00 to 04:00
+      - series: 'requests{anomaly_name="dropzero",anomaly_type="requests",anomaly_strategy="adaptive",job="synthetic"}'
+        values: '100+0x2999 0+0x119 100+0x1199'
+      - series: 'requests{anomaly_name="dropzero",anomaly_type="requests",anomaly_strategy="robust",job="synthetic"}'
+        values: '100+0x2999 0+0x119 100+0x1199'
+      # bizhours: 100 req/s from 08:00 to 18:00, zero otherwise
+      - series: 'requests{anomaly_name="bizhours",anomaly_type="requests",anomaly_strategy="adaptive",job="synthetic"}'
+        values: '0+0x479 100+0x599 0+0x359 0+0x479 100+0x599 0+0x359 0+0x479 100+0x599 0+0x359'
+      - series: 'requests{anomaly_name="bizhours",anomaly_type="requests",anomaly_strategy="robust",job="synthetic"}'
+        values: '0+0x479 100+0x599 0+0x359 0+0x479 100+0x599 0+0x359 0+0x479 100+0x599 0+0x359'
+
+    promql_expr_test:
+      ####### sparse
+
+      # [adaptive] sparse requests metric is excluded from select
+      - expr: 'count(anomaly:adaptive:select{anomaly_name="sparse"}) or vector(0)'
+        eval_time: 36h
+        exp_samples:
+          - value: 0
+
+      # [adaptive] steady requests metric is selected
+      - expr: 'count(anomaly:adaptive:select{anomaly_name="steady"}) > bool 0'
+        eval_time: 36h
+        exp_samples:
+          - value: 1
+
+      # [robust] sparse requests metric is excluded from select
+      - expr: 'count(anomaly:robust:select{anomaly_name="sparse"}) or vector(0)'
+        eval_time: 36h
+        exp_samples:
+          - value: 0
+
+      # [robust] steady requests metric is selected
+      - expr: 'count(anomaly:robust:select{anomaly_name="steady"}) > bool 0'
+        eval_time: 36h
+        exp_samples:
+          - value: 1
+
+      ####### steady
+
+      # [adaptive] steady metric inside bands before the spike
+      - expr: 'count(anomaly:level{anomaly_name="steady",anomaly_strategy="adaptive"} > anomaly:upper_band{anomaly_name="steady",anomaly_strategy="adaptive"} or anomaly:level{anomaly_name="steady",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="steady",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 33h
+        exp_samples:
+          - value: 0
+
+      # [adaptive] x3 spike breaches the upper band after 10m
+      - expr: 'count(anomaly:level{anomaly_name="steady",anomaly_strategy="adaptive"} > anomaly:upper_band{anomaly_name="steady",anomaly_strategy="adaptive"}) > bool 0'
+        eval_time: 34h10m
+        exp_samples:
+          - value: 1
+
+      # [adaptive] steady metric inside bands 3h after the spike
+      - expr: 'count(anomaly:level{anomaly_name="steady",anomaly_strategy="adaptive"} > anomaly:upper_band{anomaly_name="steady",anomaly_strategy="adaptive"} or anomaly:level{anomaly_name="steady",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="steady",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 37h45m
+        exp_samples:
+          - value: 0
+
+      # [adaptive] steady metric inside bands at spike time the day after
+      - expr: 'count(anomaly:level{anomaly_name="steady",anomaly_strategy="adaptive"} > anomaly:upper_band{anomaly_name="steady",anomaly_strategy="adaptive"} or anomaly:level{anomaly_name="steady",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="steady",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 58h20m
+        exp_samples:
+          - value: 0
+
+      # [robust] steady metric inside bands before the spike
+      - expr: 'count(anomaly:level{anomaly_name="steady",anomaly_strategy="robust"} > anomaly:upper_band{anomaly_name="steady",anomaly_strategy="robust"} or anomaly:level{anomaly_name="steady",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="steady",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 33h
+        exp_samples:
+          - value: 0
+
+      # [robust] x3 spike breaches the upper band after 40m
+      - expr: 'count(anomaly:level{anomaly_name="steady",anomaly_strategy="robust"} > anomaly:upper_band{anomaly_name="steady",anomaly_strategy="robust"}) > bool 0'
+        eval_time: 34h40m
+        exp_samples:
+          - value: 1
+
+      # [robust] steady metric inside bands 3h after the spike
+      - expr: 'count(anomaly:level{anomaly_name="steady",anomaly_strategy="robust"} > anomaly:upper_band{anomaly_name="steady",anomaly_strategy="robust"} or anomaly:level{anomaly_name="steady",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="steady",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 37h45m
+        exp_samples:
+          - value: 0
+
+      # [robust] steady metric inside bands at spike time the day after
+      - expr: 'count(anomaly:level{anomaly_name="steady",anomaly_strategy="robust"} > anomaly:upper_band{anomaly_name="steady",anomaly_strategy="robust"} or anomaly:level{anomaly_name="steady",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="steady",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 58h20m
+        exp_samples:
+          - value: 0
+
+      # [adaptive] seasonal upper band widens at spike time the day after
+      - expr: 'count(anomaly:upper_band{anomaly_name="steady",anomaly_strategy="adaptive"} > 200) > bool 0'
+        eval_time: 58h20m
+        exp_samples:
+          - value: 1
+
+      ####### errors and latency
+
+      # [adaptive] errors lower band is zero
+      - expr: 'count(anomaly:lower_band{anomaly_name="errors",anomaly_strategy="adaptive"} == 0)'
+        eval_time: 36h
+        exp_samples:
+          - value: 1
+
+      # [adaptive] latency lower band is zero
+      - expr: 'count(anomaly:lower_band{anomaly_name="latency",anomaly_strategy="adaptive"} == 0)'
+        eval_time: 36h
+        exp_samples:
+          - value: 1
+
+      # [adaptive] errors lower band exists wherever the upper band exists
+      - expr: 'count(anomaly:upper_band{anomaly_name="errors",anomaly_strategy="adaptive"} unless anomaly:lower_band{anomaly_name="errors",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 36h
+        exp_samples:
+          - value: 0
+
+      # [adaptive] x5 error burst breaches the upper band after 10m
+      - expr: 'count(anomaly:level{anomaly_name="errors",anomaly_strategy="adaptive"} > anomaly:upper_band{anomaly_name="errors",anomaly_strategy="adaptive"}) > bool 0'
+        eval_time: 38h10m
+        exp_samples:
+          - value: 1
+
+      # [adaptive] errors dropping to zero do not breach the lower band
+      - expr: 'count(anomaly:level{anomaly_name="errors",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="errors",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 55h
+        exp_samples:
+          - value: 0
+
+      # [robust] errors lower band is zero
+      - expr: 'count(anomaly:lower_band{anomaly_name="errors",anomaly_strategy="robust"} == 0)'
+        eval_time: 36h
+        exp_samples:
+          - value: 1
+
+      # [robust] latency lower band is zero
+      - expr: 'count(anomaly:lower_band{anomaly_name="latency",anomaly_strategy="robust"} == 0)'
+        eval_time: 36h
+        exp_samples:
+          - value: 1
+
+      # [robust] errors lower band exists wherever the upper band exists
+      - expr: 'count(anomaly:upper_band{anomaly_name="errors",anomaly_strategy="robust"} unless anomaly:lower_band{anomaly_name="errors",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 36h
+        exp_samples:
+          - value: 0
+
+      # [robust] x5 error burst breaches the upper band after 40m
+      - expr: 'count(anomaly:level{anomaly_name="errors",anomaly_strategy="robust"} > anomaly:upper_band{anomaly_name="errors",anomaly_strategy="robust"}) > bool 0'
+        eval_time: 38h40m
+        exp_samples:
+          - value: 1
+
+      # [robust] errors dropping to zero do not breach the lower band
+      - expr: 'count(anomaly:level{anomaly_name="errors",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="errors",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 55h
+        exp_samples:
+          - value: 0
+
+      ####### drop to zero
+
+      # [adaptive] drop to zero does not breach the lower band 10m into the outage
+      - expr: 'count(anomaly:level{anomaly_name="dropzero",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="dropzero",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 50h10m
+        exp_samples:
+          - value: 0
+
+      # [adaptive] drop to zero does not breach the lower band 1h into the outage
+      - expr: 'count(anomaly:level{anomaly_name="dropzero",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="dropzero",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 51h
+        exp_samples:
+          - value: 0
+
+      # [adaptive] recovery after the outage stays inside bands
+      - expr: 'count(anomaly:level{anomaly_name="dropzero",anomaly_strategy="adaptive"} > anomaly:upper_band{anomaly_name="dropzero",anomaly_strategy="adaptive"} or anomaly:level{anomaly_name="dropzero",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="dropzero",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 52h30m
+        exp_samples:
+          - value: 0
+
+      # [robust] drop to zero does not breach the lower band 10m into the outage
+      - expr: 'count(anomaly:level{anomaly_name="dropzero",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="dropzero",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 50h10m
+        exp_samples:
+          - value: 0
+
+      # [robust] drop to zero does not breach the lower band 1h into the outage
+      - expr: 'count(anomaly:level{anomaly_name="dropzero",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="dropzero",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 51h
+        exp_samples:
+          - value: 0
+
+      # [robust] recovery after the outage stays inside bands
+      - expr: 'count(anomaly:level{anomaly_name="dropzero",anomaly_strategy="robust"} > anomaly:upper_band{anomaly_name="dropzero",anomaly_strategy="robust"} or anomaly:level{anomaly_name="dropzero",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="dropzero",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 52h30m
+        exp_samples:
+          - value: 0
+
+      # [adaptive] drop to zero produces no level sample
+      - expr: 'count(anomaly:level{anomaly_name="dropzero",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 50h10m
+        exp_samples:
+          - value: 0
+
+      ####### business hours
+
+      # [adaptive] business-hours metric quiet 30m after close
+      - expr: 'count(anomaly:level{anomaly_name="bizhours",anomaly_strategy="adaptive"} > anomaly:upper_band{anomaly_name="bizhours",anomaly_strategy="adaptive"} or anomaly:level{anomaly_name="bizhours",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="bizhours",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 42h30m
+        exp_samples:
+          - value: 0
+
+      # [adaptive] business-hours metric quiet 1h after open
+      - expr: 'count(anomaly:level{anomaly_name="bizhours",anomaly_strategy="adaptive"} > anomaly:upper_band{anomaly_name="bizhours",anomaly_strategy="adaptive"} or anomaly:level{anomaly_name="bizhours",anomaly_strategy="adaptive"} < anomaly:lower_band{anomaly_name="bizhours",anomaly_strategy="adaptive"}) or vector(0)'
+        eval_time: 57h
+        exp_samples:
+          - value: 0
+
+      # [robust] business-hours metric quiet 30m after close
+      - expr: 'count(anomaly:level{anomaly_name="bizhours",anomaly_strategy="robust"} > anomaly:upper_band{anomaly_name="bizhours",anomaly_strategy="robust"} or anomaly:level{anomaly_name="bizhours",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="bizhours",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 42h30m
+        exp_samples:
+          - value: 0
+
+      # [robust] business-hours metric quiet 1h after open
+      - expr: 'count(anomaly:level{anomaly_name="bizhours",anomaly_strategy="robust"} > anomaly:upper_band{anomaly_name="bizhours",anomaly_strategy="robust"} or anomaly:level{anomaly_name="bizhours",anomaly_strategy="robust"} < anomaly:lower_band{anomaly_name="bizhours",anomaly_strategy="robust"}) or vector(0)'
+        eval_time: 57h
+        exp_samples:
+          - value: 0
